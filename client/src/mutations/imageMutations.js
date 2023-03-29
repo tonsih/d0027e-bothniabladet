@@ -1,50 +1,70 @@
 import { gql } from '@apollo/client';
 
-const ADD_PRODUCT = gql`
-	mutation addProduct(
-		$category_id: ID!
+const ADD_IMAGE = gql`
+	mutation addImage(
+		$tag_id: ID!
 		$title: String!
 		$price: Float!
-		$amount: Int!
-		$img_url: String!
+		$uses: Int!
+		$image_url: String!
 		$description: String!
 	) {
-		addProduct(
-			category_id: $category_id
+		addImage(
+			tag_id: $tag_id
 			title: $title
 			price: $price
-			amount: $amount
-			img_url: $img_url
+			uses: $uses
+			image_url: $image_url
 			description: $description
 		) {
-			category_id
+			tag_id
 			title
 			price
-			amount
-			img_url
+			uses
+			image_url
 			description
 		}
 	}
 `;
 
-const UPDATE_PRODUCT = gql`
-	mutation updateProduct($email: String!, $password: String!) {
-		updateProduct(email: $email, password: $password) {
-			user_id
-			email
-			admin
-			blocked
+const UPDATE_IMAGE = gql`
+	mutation updateImage(
+			tag_id: $tag_id
+			title: $title
+			price: $price
+			uses: $uses
+			image_url: $image_url
+			description: $description
+	) {
+		updateImage() {
+			tag_id
+			title
+			price
+			uses
+			image_url
+			description
 		}
 	}
 `;
 
-const DELETE_PRODUCT = gql`
-	mutation deleteProduct {
-		deleteProduct {
-			user_id
-			email
+const DELETE_IMAGE = gql`
+	mutation deleteImage(
+			tag_id: $tag_id
+			title: $title
+			price: $price
+			uses: $uses
+			image_url: $image_url
+			description: $description
+	) {
+		deleteImage {
+			tag_id
+			title
+			price
+			uses
+			image_url
+			description
 		}
 	}
 `;
 
-export { ADD_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT };
+export { ADD_IMAGE, UPDATE_IMAGE, DELETE_IMAGE };

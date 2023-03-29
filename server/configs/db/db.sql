@@ -199,8 +199,8 @@ create table bothniabladet.user_offer(
 */
 
 insert into bothniabladet.user 
-(first_name,  last_name,  email,             password) VALUES 
-('admin',     'admin',  'admin@bothnia.se', '$2b$10$YwyBdxMw9QhfKb3VpDG1jeuuA4AuCQBLuB8omOL3k0JAE5UULJ53G');
+(first_name,  last_name,  email,             admin,   password) VALUES 
+('admin',     'admin',  'admin@bothnia.se',  true,    '$2b$10$YwyBdxMw9QhfKb3VpDG1jeuuA4AuCQBLuB8omOL3k0JAE5UULJ53G');
 
 insert into bothniabladet.shopping_cart 
 (user_id, total_price) values 
@@ -317,13 +317,13 @@ after update on bothniabladet.shopping_cart_image for each row
 ------------------------------------------------------------------------
 */
 
-drop event if exists store.clean_shopping_cart;
+drop event if exists bothniabladet.clean_shopping_cart;
 
-create event store.clean_shopping_cart
+create event bothniabladet.clean_shopping_cart
     on schedule
       every 3 second
     do        
-        delete from store.shopping_cart_image
+        delete from bothniabladet.shopping_cart_image
         where shopping_cart_image_id 
         in 
         (select shopping_cart_image_id 

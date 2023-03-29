@@ -25,7 +25,7 @@ const Header = () => {
 	}, [isSuccess, dispatch, reset]);
 
 	useEffect(() => {
-		if (user && user.blocked) {
+		if (user && user.me && user.me.blocked) {
 			dispatch(logout());
 		}
 	}, [user, dispatch, logout]);
@@ -53,7 +53,7 @@ const Header = () => {
 
 	const LoggedInHeader = props => (
 		<>
-			{user && user.admin && (
+			{user && user.me && user.me.admin && (
 				<li className='nav-item'>
 					<MenuPopupState />
 				</li>
@@ -71,7 +71,7 @@ const Header = () => {
 			</li>
 			<li className='nav-item'>
 				<MenuButton sx={{ textTransform: 'lowercase' }}>
-					{user && user.email}
+					{user && user.me && user.me.email}
 				</MenuButton>
 			</li>
 		</>
@@ -84,7 +84,7 @@ const Header = () => {
 					<Link to='/' className='navbar-brand'>
 						<div className='d-flex align-items-center'>
 							<FaStore className='pr-3' />
-							<div className='logo-text'>Store</div>
+							<div className='logo-text'>BothniaBladet</div>
 						</div>
 					</Link>
 					<ul className='nav navbar-nav ml-auto d-flex flex-row align-items-center justify-content-between'>

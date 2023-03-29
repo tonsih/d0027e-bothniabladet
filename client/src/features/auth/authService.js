@@ -39,7 +39,9 @@ const getMe = async () => {
 		query: ME_QUERY,
 	});
 
-	return await data.me;
+	console.log(data);
+
+	return await data;
 };
 
 const authService = {

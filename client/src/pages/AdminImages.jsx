@@ -1,21 +1,19 @@
 import { useQuery } from '@apollo/client';
-import { FaPlus } from 'react-icons/fa';
-import ActionButton from '../components/ActionButton';
-import AddProductModal from '../components/AddProductModal';
-import ProductRow from '../components/ProductRow';
+import AddImageModal from '../components/AddImageModal';
+import ImageRow from '../components/ImageRow';
 import Spinner from '../components/Spinner';
-import { GET_PRODUCTS } from '../queries/productQueries';
-import '../scss/AdminProducts.scss';
+import { GET_IMAGES } from '../queries/imageQueries';
+import '../scss/AdminImages.scss';
 
-const AdminProducts = () => {
-	const { data, loading } = useQuery(GET_PRODUCTS);
+const AdminImages = () => {
+	const { data, loading } = useQuery(GET_IMAGES);
 
 	if (loading) return <Spinner />;
 
 	return (
 		<>
 			<section>
-				<AddProductModal />
+				<AddImageModal />
 				<table className='table table-dark table-hover'>
 					<thead>
 						<tr>
@@ -23,15 +21,15 @@ const AdminProducts = () => {
 							<th scope='col'>Image</th>
 							<th scope='col'>Title</th>
 							<th scope='col'>Price</th>
-							<th scope='col'>Amount</th>
+							<th scope='col'>Uses</th>
 							<th scope='col'>Description</th>
 							<th scope='col'>Edit</th>
 							<th scope='col'>Delete</th>
 						</tr>
 					</thead>
 					<tbody>
-						{data.products.map(product => (
-							<ProductRow product={product} key={product.product_id} />
+						{data.images.map(image => (
+							<ImageRow image={image} key={image.image_id} />
 						))}
 					</tbody>
 				</table>
@@ -39,4 +37,4 @@ const AdminProducts = () => {
 		</>
 	);
 };
-export default AdminProducts;
+export default AdminImages;

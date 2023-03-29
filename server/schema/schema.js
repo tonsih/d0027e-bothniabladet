@@ -236,7 +236,7 @@ const RootQuery = new GraphQLObjectType({
 		},
 		me: {
 			type: UserType,
-			async resolve(_, _, { session }) {
+			async resolve(_, __, { session }) {
 				const user_id = session.userId;
 				let matchedUser;
 
@@ -303,9 +303,10 @@ const RootQuery = new GraphQLObjectType({
 		},
 		shopping_cart: {
 			type: ShoppingCartType,
-			args: { shopping_cart_id: { type: GraphQLID } },
-			async resolve(_, args) {
-				return await shopping_cart.findByPk(args.shopping_cart_id);
+			async resolve(_, args, { session }) {
+				return await shopping_cart.findOne({
+					where: { user_id: session.userId },
+				});
 			},
 		},
 		shopping_carts: {
@@ -447,7 +448,7 @@ const mutation = new GraphQLObjectType({
 		},
 		logoutUser: {
 			type: UserType,
-			async resolve(_, _, { session }) {
+			async resolve(_, __, { session }) {
 				const res = new Promise(res =>
 					session.destroy(err => {
 						if (err) console.log('logout error: ', err);

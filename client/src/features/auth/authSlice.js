@@ -4,8 +4,6 @@ import {
 	createSelector,
 } from '@reduxjs/toolkit';
 import authService from './authService';
-import { ME_QUERY } from '../../queries/userQueries';
-import { useSelector } from 'react-redux';
 
 const initialState = {
 	user: null,
@@ -65,46 +63,6 @@ export const getMe = createAsyncThunk('auth/me', async thunkAPI => {
 		return thunkAPI.rejectWithValue(errors);
 	}
 });
-
-// export const userSelector = createSelector(
-// 	state => state.auth.user,
-// 	user => user
-// );
-
-// export const userAdminSelector = createSelector(
-// 	state => state.auth.user.admin,
-// 	blocked => blocked
-// );
-
-// export const userBlockedSelector = createSelector(
-// 	state => state.auth.user.blocked,
-// 	blocked => blocked
-// );
-
-// export const isErrorSelector = createSelector(
-// 	state => state.auth.isError,
-// 	isError => isError
-// );
-
-// export const isSuccessSelector = createSelector(
-// 	state => state.auth.isSuccess,
-// 	isSuccess => isSuccess
-// );
-
-// export const isLoadingSelector = createSelector(
-// 	state => state.auth.isLoading,
-// 	isLoading => isLoading
-// );
-
-// export const errorMessageSelector = createSelector(
-// 	state => state.auth.message.error,
-// 	errorMessage => errorMessage
-// );
-
-// export const successMessageSelector = createSelector(
-// 	state => state.auth.message.success,
-// 	successMessage => successMessage
-// );
 
 export const authSlice = createSlice({
 	name: 'auth',

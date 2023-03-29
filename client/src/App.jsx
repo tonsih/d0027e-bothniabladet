@@ -7,11 +7,11 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Footer from './components/Footer';
 import { useState } from 'react';
-import ProductPage from './pages/ProductPage';
+import ImagePage from './pages/ImagePage';
 import { useMemo } from 'react';
 import NotFound from './pages/NotFound';
 import AdminUsers from './pages/AdminUsers';
-import AdminProducts from './pages/AdminProducts';
+import AdminImages from './pages/AdminImages';
 
 import { Provider } from 'react-redux';
 import { store } from './app/store';
@@ -45,11 +45,8 @@ const App = () => {
 								<Route path='/login' element={<Login />} />
 								<Route path='/register' element={<Register />} />
 								<Route path='/admin/users' element={<AdminUsers />} />
-								<Route path='/admin/products' element={<AdminProducts />} />
-								<Route
-									path='/product/:product'
-									element={<ProductPage />}
-								></Route>
+								<Route path='/admin/images' element={<AdminImages />} />
+								<Route path='/image/:image' element={<ImagePage />}></Route>
 							</Routes>
 						</main>
 						<Footer />

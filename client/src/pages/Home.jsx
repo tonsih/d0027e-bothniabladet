@@ -1,6 +1,6 @@
-import Products from '../components/Products';
+import Images from '../components/Images';
 
 const Home = () => {
-	return <Products />;
+	return <Images />;
 };
 export default Home;

@@ -1,19 +1,19 @@
 import { StyledLink } from '../style/styledComponents/StyledLink';
 import ActionButton from './ActionButton';
 
-const ProductCard = ({ product }) => {
-	const { product_id, title, price, amount, description, img_url } = product;
+const ImageCard = ({ image }) => {
+	const { image_id, title, price, uses, description, image_url } = image;
 	return (
 		<div className='card h-100'>
 			<StyledLink
-				to={`/product/${product.product_id}`}
-				key={product.product_id}
+				to={`/image/${image.image_id}`}
+				key={image.image_id}
 				className='w-100'
 			>
 				<img
 					className='card-img-top'
-					alt={product_id}
-					src={img_url || 'https://placehold.co/500x400'}
+					alt={image_id}
+					src={image_url || 'https://placehold.co/500x400'}
 				></img>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>
@@ -21,9 +21,7 @@ const ProductCard = ({ product }) => {
 				</div>
 				<ul className='list-group list-group-flush'>
 					<li className='list-group-item border-top'>Price: ${price}</li>
-					<li className='list-group-item border-bottom'>
-						Amount in store: {amount}
-					</li>
+					<li className='list-group-item border-bottom'>No. uses: {uses}</li>
 				</ul>
 				<div className='card-body d-flex align-items-end'>
 					<ActionButton
@@ -39,4 +37,4 @@ const ProductCard = ({ product }) => {
 	);
 };
 
-export default ProductCard;
+export default ImageCard;

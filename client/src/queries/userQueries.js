@@ -8,6 +8,10 @@ const ME_QUERY = gql`
 			admin
 			blocked
 		}
+
+		shopping_cart {
+			total_price
+		}
 	}
 `;
 

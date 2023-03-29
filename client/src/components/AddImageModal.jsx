@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import { TextareaAutosize, TextField, ThemeProvider } from '@mui/material';
 import { theme } from '../style/themes';
 
-const AddProductModal = () => {
+const AddImageModal = () => {
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => setShow(false);
@@ -18,7 +18,7 @@ const AddProductModal = () => {
 		title: yup.string().required().min(1).max(50),
 		price: yup.string().required(),
 		description: yup.string().required().max(255),
-		amount_in_stock: yup.string().required(),
+		uses: yup.string().required(),
 	});
 
 	const MyTextField = ({
@@ -55,12 +55,12 @@ const AddProductModal = () => {
 				className='btn p-3'
 				onClick={handleShow}
 			>
-				<h6 className='p-0 m-0'>Add product</h6>
+				<h6 className='p-0 m-0'>Add Image</h6>
 			</ActionButton>
 
 			<Modal show={show} onHide={handleClose}>
 				<Modal.Header closeButton>
-					<Modal.Title>Add Product</Modal.Title>
+					<Modal.Title>Add Image</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className='d-flex justify-content-center'>
 					<ThemeProvider theme={theme}>
@@ -106,9 +106,9 @@ const AddProductModal = () => {
 									</div>
 									<div className='textfield'>
 										<MyTextField
-											name='amount_in_stock'
-											label='amount in stock'
-											placeholder='amount in stock'
+											name='uses'
+											label='uses'
+											placeholder='uses'
 											type='input'
 											as={TextField}
 										/>
@@ -130,4 +130,4 @@ const AddProductModal = () => {
 		</>
 	);
 };
-export default AddProductModal;
+export default AddImageModal;

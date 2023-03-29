@@ -28,8 +28,8 @@ export default function MenuPopupState() {
 								<MenuItem onClick={popupState.close}>Users</MenuItem>
 							</Link>
 
-							<Link to='/admin/products'>
-								<MenuItem onClick={popupState.close}>Products</MenuItem>
+							<Link to='/admin/images'>
+								<MenuItem onClick={popupState.close}>Images</MenuItem>
 							</Link>
 						</Menu>
 					</ThemeProvider>
