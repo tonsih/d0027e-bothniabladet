@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+body {
+	margin: 0;
+	font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+		'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
+}
+
+.logo-text {
+	margin-left: 5px;
+}
+
+.bg-dark {
+	background-color: #171a1d !important;
+}
+
+.btn-dark {
+	background-color: #171a1d !important;
+}
+
+ul {
+	list-style: none;
+}
+li {
+	padding: 0 1em;
+}
+
+footer {
+	background-color: #171a1d !important;
+}
+
+.navbar-brand {
+	font-size: 1.5em;
+}
+
+.card-img-top {
+	width: 100%;
+	object-fit: cover;
+}
+
+.textfield {
+	margin-bottom: 1rem;
+}
+
+a {
+	text-decoration: none;
+
+	&:focus,
+	&:hover,
+	&:visited,
+	&:link,
+	&:active {
+		text-decoration: none;
+	}
+}
+
+main {
+	font-family: roboto;
+}
+
+.card {
+	background-color: #171a1d;
+	&:hover {
+		background-color: #171a1da6;
+	}
+
+	li {
+		background-color: transparent;
+	}
+
+	.card-body {
+		color: white;
+	}
+}
