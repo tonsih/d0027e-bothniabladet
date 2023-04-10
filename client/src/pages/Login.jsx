@@ -49,7 +49,7 @@ const Login = ({ client }) => {
 			let path = localStorage.getItem('ref');
 			path = await JSON.parse(path);
 
-			if (isSuccess && user && !user.blocked) {
+			if (isSuccess && user && !user.banned) {
 				if (path) navigate(path);
 				else navigate('/');
 			}
@@ -66,14 +66,14 @@ const Login = ({ client }) => {
 
 	return (
 		<>
-			{isError && message && (
+			{isError && message && message.error && (
 				<div className='alert alert-danger' role='alert'>
 					{message.error[0]}
 				</div>
 			)}
-			{user && user.blocked && (
+			{user && user.banned && (
 				<div className='alert alert-danger' role='alert'>
-					This account is blocked!
+					This account is banned!
 				</div>
 			)}
 			{isSuccess && !isError && message && message.success && (

@@ -204,7 +204,7 @@ insert into bothniabladet.user
 
 insert into bothniabladet.shopping_cart 
 (user_id, total_price) values 
-(1,       31.50);
+(1,       48.33);
 
 insert into bothniabladet.tag
 (name) values 
@@ -218,7 +218,9 @@ insert into bothniabladet.image
 
 insert into bothniabladet.shopping_cart_image
 (shopping_cart_id,  image_id,    time_added) values 
-(1,                   1,         now());
+(1,                   1,         now()),
+(1,                   2,         now()),
+(1,                   3,         now());
 
 insert into bothniabladet.image_tag
 (image_id, tag_id) values 
@@ -302,6 +304,10 @@ create trigger bothniabladet.total_order_price_update
 after update on bothniabladet.order_image for each row
       call bothniabladet.update_order_total_price(old.order_id);
 
+create trigger bothniabladet.total_order_price_delete
+after delete on bothniabladet.order_image for each row
+      call bothniabladet.update_order_total_price(old.order_id);
+
 create trigger bothniabladet.total_shopping_cart_price_insert
 after insert on bothniabladet.shopping_cart_image for each row
       call bothniabladet.update_shopping_cart_total_price(new.shopping_cart_id);
@@ -310,6 +316,9 @@ create trigger bothniabladet.total_shopping_cart_price_update
 after update on bothniabladet.shopping_cart_image for each row
       call bothniabladet.update_shopping_cart_total_price(old.shopping_cart_id);
 
+create trigger bothniabladet.total_shopping_cart_price_delete
+after delete on bothniabladet.shopping_cart_image for each row
+      call bothniabladet.update_shopping_cart_total_price(old.shopping_cart_id);
 
 /*
 ------------------------------------------------------------------------

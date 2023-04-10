@@ -16,7 +16,7 @@ const REGISTER_USER = gql`
 			user_id
 			email
 			admin
-			blocked
+			banned
 		}
 	}
 `;
@@ -27,7 +27,7 @@ const LOGIN_USER = gql`
 			user_id
 			email
 			admin
-			blocked
+			banned
 		}
 	}
 `;
@@ -48,7 +48,7 @@ const UPDATE_USER = gql`
 		$last_name: String
 		$email: String
 		$password: String
-		$blocked: Boolean
+		$banned: Boolean
 		$admin: Boolean
 	) {
 		updateUser(
@@ -57,7 +57,7 @@ const UPDATE_USER = gql`
 			last_name: $last_name
 			email: $email
 			password: $password
-			blocked: $blocked
+			banned: $banned
 			admin: $admin
 		) {
 			user_id

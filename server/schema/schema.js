@@ -37,7 +37,7 @@ const UserType = new GraphQLObjectType({
 		last_name: { type: GraphQLString },
 		email: { type: GraphQLString },
 		password: { type: GraphQLString },
-		blocked: { type: GraphQLBoolean },
+		banned: { type: GraphQLBoolean },
 		admin: { type: GraphQLBoolean },
 	}),
 });
@@ -309,6 +309,17 @@ const RootQuery = new GraphQLObjectType({
 				});
 			},
 		},
+		shopping_cart_by_user_id: {
+			type: ShoppingCartType,
+			args: { user_id: { type: GraphQLID } },
+			async resolve(_, args) {
+				return await shopping_cart.findOne({
+					where: {
+						user_id: args.user_id,
+					},
+				});
+			},
+		},
 		shopping_carts: {
 			type: GraphQLList(ShoppingCartType),
 			async resolve() {
@@ -326,6 +337,17 @@ const RootQuery = new GraphQLObjectType({
 			type: GraphQLList(ShoppingCartImageType),
 			async resolve() {
 				return await shopping_cart_image.findAll();
+			},
+		},
+		shopping_cart_images_by_sc_id: {
+			type: GraphQLList(ShoppingCartImageType),
+			args: { shopping_cart_id: { type: GraphQLID } },
+			async resolve(_, args) {
+				return await shopping_cart_image.findAll({
+					where: {
+						shopping_cart_id: args.shopping_cart_id,
+					},
+				});
 			},
 		},
 		offer: {

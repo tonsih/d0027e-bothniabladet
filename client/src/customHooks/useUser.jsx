@@ -13,10 +13,10 @@ export const useUser = ({ setUser, user, logoutUser }) => {
 				if (data.me) {
 					setState(state => ({ ...state, data: data.me }));
 					if (data.me.admin) setUser(state => ({ ...state, admin: true }));
-					if (data.me.blocked) {
+					if (data.me.banned) {
 						try {
 							await logoutUser();
-							setUser(state => ({ ...state, loggedIn: false, blocked: false }));
+							setUser(state => ({ ...state, loggedIn: false, banned: false }));
 						} catch (error) {
 							console.log(error);
 						}

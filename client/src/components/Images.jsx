@@ -14,6 +14,7 @@ const Images = () => {
 			<div className='row'>
 				{!loading &&
 					!error &&
+					data?.images &&
 					data.images.map(image => (
 						<div
 							className='col-sm-12 col-md-6 col-lg-4 col-xl-4 pb-3'

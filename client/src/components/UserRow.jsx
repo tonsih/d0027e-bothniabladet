@@ -17,7 +17,7 @@ import { ME_QUERY, USERS_QUERY } from '../queries/userQueries';
 import { Button } from '@mui/material';
 
 const UserRow = ({ user: curUser }) => {
-	const { user_id, first_name, last_name, email, admin, blocked } = curUser;
+	const { user_id, first_name, last_name, email, admin, banned } = curUser;
 
 	const [updateUser] = useMutation(UPDATE_USER, {
 		refetchQueries: [{ query: USERS_QUERY }],
@@ -40,7 +40,7 @@ const UserRow = ({ user: curUser }) => {
 			<td>{last_name}</td>
 			<td>{email}</td>
 			<td>{admin && <FaCheckCircle />}</td>
-			<td>{blocked && <FaBan />}</td>
+			<td>{banned && <FaBan />}</td>
 			<td>
 				{!admin && (
 					<>
@@ -93,7 +93,7 @@ const UserRow = ({ user: curUser }) => {
 				)}
 			</td>
 			<td>
-				{!blocked && (
+				{!banned && (
 					<Button
 						color='secondary'
 						onClick={async () => {
@@ -101,7 +101,7 @@ const UserRow = ({ user: curUser }) => {
 								await updateUser({
 									variables: {
 										user_id: user_id,
-										blocked: true,
+										banned: true,
 									},
 								});
 							} catch (error) {
@@ -118,7 +118,7 @@ const UserRow = ({ user: curUser }) => {
 				)}
 			</td>
 			<td>
-				{blocked && (
+				{banned && (
 					<>
 						<Button
 							className='btn'
@@ -128,7 +128,7 @@ const UserRow = ({ user: curUser }) => {
 									await updateUser({
 										variables: {
 											user_id: user_id,
-											blocked: false,
+											banned: false,
 										},
 									});
 								} catch (error) {
@@ -147,6 +147,7 @@ const UserRow = ({ user: curUser }) => {
 						className='btn'
 						variant='contained'
 						color='secondary'
+						disabled={user_id === meData.me.user_id}
 						onClick={async () => {
 							try {
 								await deleteUser({

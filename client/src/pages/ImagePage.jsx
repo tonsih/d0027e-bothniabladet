@@ -1,15 +1,20 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import Spinner from '../components/Spinner';
 import { GET_IMAGE } from '../queries/imageQueries';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import ActionButton from '../components/ActionButton';
 import { useSelector } from 'react-redux';
+import { ADD_SHOPPING_CART_IMAGE } from '../mutations/shoppingCartMutations';
+import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
 
 const ImagePage = () => {
 	const { image: image_id } = useParams();
 	const { error, loading, data } = useQuery(GET_IMAGE, {
 		variables: { image_id },
+	});
+	const [addShoppingCartImage] = useMutation(ADD_SHOPPING_CART_IMAGE, {
+		refetchQueries: [{ query: USER_SHOPPING_CART_IMAGES }],
 	});
 
 	const { user } = useSelector(state => state.auth);
@@ -25,6 +30,22 @@ const ImagePage = () => {
 	const onClickHandler = () => {
 		localStorage.setItem('ref', JSON.stringify(path));
 		navigate('/login');
+	};
+
+	// shopping_cart_id: $shopping_cart_id
+	// image_id: $image_id
+	// time_added: $time_added
+
+	console.log(user?.shopping_cart?.shopping_cart_id);
+
+	const onAddToCart = (shoppingCartId, imageId) => {
+		addShoppingCartImage({
+			variables: {
+				shopping_cart_id: shoppingCartId,
+				image_id: imageId,
+				time_added: '2007-12-03T10:15:30Z',
+			},
+		});
 	};
 
 	return (
@@ -60,7 +81,15 @@ const ImagePage = () => {
 										variant='outlined'
 										color='primary'
 										className='w-100 p-3'
-										{...(!user && { onClick: onClickHandler })}
+										{...(!user?.shopping_cart
+											? { onClick: onClickHandler }
+											: {
+													onClick: () =>
+														onAddToCart(
+															user.shopping_cart.shopping_cart_id,
+															data.image.image_id
+														),
+											  })}
 									>
 										{user ? (
 											<>

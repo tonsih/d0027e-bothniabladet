@@ -5,6 +5,7 @@ import {
 } from '../../mutations/userMutations';
 import { client } from '../../App';
 import { ME_QUERY } from '../../queries/userQueries';
+import { USER_SHOPPING_CART } from '../../queries/shoppingCartQueries';
 
 const register = async ({ first_name, last_name, email, password }) => {
 	const { data } = await client.mutate({
@@ -23,8 +24,19 @@ const login = async ({ email, password }) => {
 		refetchQueries: [{ query: ME_QUERY }],
 	});
 
-	console.log(data.loginUser);
-	return await data.loginUser;
+	const { loginUser } = await data;
+
+	const { data: scData } = await client.query({
+		query: USER_SHOPPING_CART,
+		variables: { user_id: loginUser.user_id },
+	});
+
+	return {
+		me: { ...loginUser },
+		shopping_cart: {
+			shopping_cart_id: scData.shopping_cart_by_user_id.shopping_cart_id,
+		},
+	};
 };
 
 const logout = async () => {
@@ -39,9 +51,17 @@ const getMe = async () => {
 		query: ME_QUERY,
 	});
 
-	console.log(data);
+	const { data: scData } = await client.query({
+		query: USER_SHOPPING_CART,
+		variables: { user_id: data.me.user_id },
+	});
 
-	return await data;
+	return {
+		me: { ...data.me },
+		shopping_cart: {
+			shopping_cart_id: scData.shopping_cart_by_user_id.shopping_cart_id,
+		},
+	};
 };
 
 const authService = {

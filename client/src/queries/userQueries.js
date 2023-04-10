@@ -6,10 +6,11 @@ const ME_QUERY = gql`
 			user_id
 			email
 			admin
-			blocked
+			banned
 		}
 
 		shopping_cart {
+			shopping_cart_id
 			total_price
 		}
 	}
@@ -23,7 +24,7 @@ const USERS_QUERY = gql`
 			last_name
 			email
 			admin
-			blocked
+			banned
 		}
 	}
 `;

@@ -6,9 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Footer from './components/Footer';
-import { useState } from 'react';
 import ImagePage from './pages/ImagePage';
-import { useMemo } from 'react';
 import NotFound from './pages/NotFound';
 import AdminUsers from './pages/AdminUsers';
 import AdminImages from './pages/AdminImages';
@@ -18,6 +16,7 @@ import { store } from './app/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getMe } from './features/auth/authSlice';
+import ShoppingCart from './pages/ShoppingCart';
 
 export const client = new ApolloClient({
 	uri: 'http://localhost:5000/graphql',
@@ -26,12 +25,6 @@ export const client = new ApolloClient({
 });
 
 const App = () => {
-	const [user, setUser] = useState({
-		loggedIn: false,
-		admin: false,
-		blocked: false,
-	});
-
 	return (
 		<>
 			<ApolloProvider client={client}>
@@ -47,6 +40,7 @@ const App = () => {
 								<Route path='/admin/users' element={<AdminUsers />} />
 								<Route path='/admin/images' element={<AdminImages />} />
 								<Route path='/image/:image' element={<ImagePage />}></Route>
+								<Route path='/cart' element={<ShoppingCart />}></Route>
 							</Routes>
 						</main>
 						<Footer />

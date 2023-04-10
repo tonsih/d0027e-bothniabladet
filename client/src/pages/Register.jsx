@@ -42,15 +42,10 @@ const Register = () => {
 	}, []);
 
 	useEffect(() => {
-		if (isError) {
-			toast.error(message.error[0]);
-			console.log(message.error);
-		}
-
 		if (isSuccess && user) {
 			navigate('/');
 		}
-	}, [isSuccess, user, isError, dispatch, reset]);
+	}, [isSuccess, user]);
 
 	const MyTextField = ({ placeholder, label, type, ...props }) => {
 		const [field, meta] = useField(props);
@@ -72,13 +67,13 @@ const Register = () => {
 
 	return (
 		<>
-			{isSuccess && !isError ? (
+			{isSuccess && !isError && message && message.success ? (
 				<div className='alert alert-success' role='alert'>
 					{message.success}
 				</div>
 			) : null}
 
-			{isError ? (
+			{isError && message && message.error ? (
 				<div className='alert alert-danger' role='alert'>
 					{message.error}
 				</div>

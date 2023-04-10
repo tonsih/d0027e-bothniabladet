@@ -10,6 +10,7 @@ const MenuButton = ({
 	disabled,
 	startIcon,
 	endIcon,
+	sx,
 }) => {
 	return (
 		<ThemeProvider theme={theme}>
@@ -21,7 +22,7 @@ const MenuButton = ({
 				disabled={disabled}
 				startIcon={startIcon}
 				endIcon={endIcon}
-				sx={{ backgroundColor: 'transparent' }}
+				sx={{ ...sx, backgroundColor: 'transparent' }}
 			>
 				{children}
 			</Button>

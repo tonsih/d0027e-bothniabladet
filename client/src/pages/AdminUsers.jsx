@@ -11,7 +11,7 @@ const AdminUsers = () => {
 	const { user } = useSelector(state => state.auth);
 
 	useEffect(() => {
-		if (!user || user.blocked || !user.admin) {
+		if (!user || !user.me || user.me.banned || !user.me.admin) {
 			navigate('/');
 		}
 	}, [user, navigate]);
@@ -28,11 +28,11 @@ const AdminUsers = () => {
 						<th scope='col'>Last name</th>
 						<th scope='col'>E-mail</th>
 						<th scope='col'>Admin</th>
-						<th scope='col'>Blocked</th>
+						<th scope='col'>Banned</th>
 						<th scope='col'>Promote</th>
 						<th scope='col'>Demote</th>
-						<th scope='col'>Block</th>
-						<th scope='col'>Unblock</th>
+						<th scope='col'>Ban</th>
+						<th scope='col'>Unban</th>
 						<th scope='col'>Delete User</th>
 					</tr>
 				</thead>

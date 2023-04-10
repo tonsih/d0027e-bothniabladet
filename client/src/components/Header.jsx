@@ -1,4 +1,10 @@
-import { FaStore, FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import {
+	FaStore,
+	FaSignInAlt,
+	FaSignOutAlt,
+	FaUser,
+	FaShoppingCart,
+} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import MenuPopupState from './AdminButton';
 import MenuButton from './MenuButton';
@@ -6,12 +12,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getMe, logout, reset } from '../features/auth/authSlice';
 import { memo, useEffect } from 'react';
 import '../scss/Header.scss';
+import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
+import { useLazyQuery, useQuery } from '@apollo/client';
 
 const Header = () => {
 	const dispatch = useDispatch();
 	const { user, isLoading, isError, isSuccess, message } = useSelector(
 		state => state.auth
 	);
+
+	const [getScImgs, { data, loading }] = useLazyQuery(
+		USER_SHOPPING_CART_IMAGES
+	);
+
+	useEffect(() => {
+		if (user?.shopping_cart)
+			getScImgs({
+				variables: { shopping_cart_id: user.shopping_cart.shopping_cart_id },
+			});
+	}, [user]);
 
 	useEffect(() => {
 		dispatch(getMe());
@@ -25,7 +44,7 @@ const Header = () => {
 	}, [isSuccess, dispatch, reset]);
 
 	useEffect(() => {
-		if (user && user.me && user.me.blocked) {
+		if (user?.me?.banned) {
 			dispatch(logout());
 		}
 	}, [user, dispatch, logout]);
@@ -53,7 +72,7 @@ const Header = () => {
 
 	const LoggedInHeader = props => (
 		<>
-			{user && user.me && user.me.admin && (
+			{user?.me?.admin && (
 				<li className='nav-item'>
 					<MenuPopupState />
 				</li>
@@ -69,9 +88,18 @@ const Header = () => {
 					Logout
 				</MenuButton>
 			</li>
+			{data && (
+				<Link to='/cart'>
+					<li className='nav-item'>
+						<MenuButton startIcon={<FaShoppingCart />}>
+							{data.shopping_cart_images_by_sc_id.length}
+						</MenuButton>
+					</li>
+				</Link>
+			)}
 			<li className='nav-item'>
 				<MenuButton sx={{ textTransform: 'lowercase' }}>
-					{user && user.me && user.me.email}
+					{user?.me?.email}
 				</MenuButton>
 			</li>
 		</>
