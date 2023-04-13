@@ -47,7 +47,7 @@ const UserRow = ({ user: curUser }) => {
 						<Button
 							className='btn'
 							variant='outlined'
-							disabled={user_id === meData.me.user_id}
+							disabled={user_id === meData?.me?.user_id}
 							onClick={async () => {
 								try {
 									await updateUser({
@@ -73,7 +73,7 @@ const UserRow = ({ user: curUser }) => {
 							className='btn'
 							variant='outlined'
 							color='secondary'
-							disabled={user_id === meData.me.user_id}
+							disabled={user_id === meData?.me?.user_id}
 							onClick={async () => {
 								try {
 									await updateUser({
@@ -100,7 +100,7 @@ const UserRow = ({ user: curUser }) => {
 							try {
 								await updateUser({
 									variables: {
-										user_id: user_id,
+										user_id,
 										banned: true,
 									},
 								});
@@ -110,10 +110,10 @@ const UserRow = ({ user: curUser }) => {
 						}}
 						className='btn'
 						variant='contained'
-						disabled={user_id === meData.me.user_id}
+						disabled={user_id === meData?.me?.user_id}
 					>
 						<FaBan />
-						{console.log(user_id === meData.me.user_id)}
+						{console.log(user_id === meData?.me?.user_id)}
 					</Button>
 				)}
 			</td>
@@ -127,7 +127,7 @@ const UserRow = ({ user: curUser }) => {
 								try {
 									await updateUser({
 										variables: {
-											user_id: user_id,
+											user_id,
 											banned: false,
 										},
 									});
@@ -147,12 +147,12 @@ const UserRow = ({ user: curUser }) => {
 						className='btn'
 						variant='contained'
 						color='secondary'
-						disabled={user_id === meData.me.user_id}
+						disabled={user_id === meData?.me?.user_id}
 						onClick={async () => {
 							try {
 								await deleteUser({
 									variables: {
-										user_id: user_id,
+										user_id,
 									},
 								});
 							} catch (error) {

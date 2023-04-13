@@ -4,14 +4,14 @@ import {
 	REGISTER_USER,
 } from '../../mutations/userMutations';
 import { client } from '../../App';
-import { ME_QUERY } from '../../queries/userQueries';
+import { ME_QUERY, USERS_QUERY } from '../../queries/userQueries';
 import { USER_SHOPPING_CART } from '../../queries/shoppingCartQueries';
 
 const register = async ({ first_name, last_name, email, password }) => {
 	const { data } = await client.mutate({
 		mutation: REGISTER_USER,
 		variables: { first_name, last_name, email, password },
-		refetchQueries: [{ query: ME_QUERY }],
+		refetchQueries: [{ query: ME_QUERY }, { query: USERS_QUERY }],
 	});
 
 	return await data.registerUser;

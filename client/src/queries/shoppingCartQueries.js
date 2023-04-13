@@ -28,6 +28,31 @@ const USER_SHOPPING_CART_IMAGES = gql`
 	}
 `;
 
+const USER_SHOPPING_CART_IMAGE = gql`
+	query shopping_cart_image_by_image_id(
+		$image_id: ID!
+		$shopping_cart_id: ID!
+	) {
+		shopping_cart_image_by_image_id(
+			image_id: $image_id
+			shopping_cart_id: $shopping_cart_id
+		) {
+			shopping_cart_image_id
+			shopping_cart {
+				shopping_cart_id
+			}
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+			}
+		}
+	}
+`;
+
 const SHOPPING_CART_IMAGES = gql`
 	query shopping_cart_images {
 		shopping_cart_images {
@@ -44,4 +69,9 @@ const SHOPPING_CART_IMAGES = gql`
 	}
 `;
 
-export { USER_SHOPPING_CART, USER_SHOPPING_CART_IMAGES, SHOPPING_CART_IMAGES };
+export {
+	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGES,
+	USER_SHOPPING_CART_IMAGE,
+	SHOPPING_CART_IMAGES,
+};

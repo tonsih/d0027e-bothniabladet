@@ -18,8 +18,6 @@ const ShoppingCart = () => {
 
 	const [getSc, { data: scData }] = useLazyQuery(USER_SHOPPING_CART);
 
-	console.log(scData);
-
 	useEffect(() => {
 		if (user?.shopping_cart) {
 			getSc({
@@ -60,11 +58,17 @@ const ShoppingCart = () => {
 							))}
 					</tbody>
 				</table>
-				{user?.shopping_cart && scData?.shopping_cart_by_user_id && (
-					<span className='totalPrice'>
-						Total: ${scData.shopping_cart_by_user_id.total_price}
-					</span>
-				)}
+				{user?.shopping_cart &&
+					scData?.shopping_cart_by_user_id &&
+					data?.shopping_cart_images_by_sc_id && (
+						<span className='orderInfo'>
+							{data?.shopping_cart_images_by_sc_id.length > 0 ? (
+								<>Total: ${scData.shopping_cart_by_user_id.total_price}</>
+							) : (
+								<>No items in the shopping cart</>
+							)}
+						</span>
+					)}
 			</section>
 		</>
 	);

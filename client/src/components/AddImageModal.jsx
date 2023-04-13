@@ -7,18 +7,40 @@ import ActionButton from './ActionButton';
 import * as yup from 'yup';
 import { TextareaAutosize, TextField, ThemeProvider } from '@mui/material';
 import { theme } from '../style/themes';
+import { ADD_IMAGE, ADD_TECHNICAL_METADATA } from '../mutations/imageMutations';
+import { gql, useMutation } from '@apollo/client';
+import { GET_IMAGES } from '../queries/imageQueries';
+import Dropzone from 'react-dropzone';
+import exifr from 'exifr';
 
 const AddImageModal = () => {
+	const uploadFileMutation = gql`
+		mutation ($file: Upload!) {
+			uploadFile(file: $file)
+		}
+	`;
+
+	const [uploadFile] = useMutation(uploadFileMutation);
+
+	const [addImage, { data: imgData }] = useMutation(ADD_IMAGE);
+	const [addTechnicalMetadata, { data: tmData }] = useMutation(
+		ADD_TECHNICAL_METADATA
+	);
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
+	const handleSubmit = () => {
+		handleClose();
+	};
+
+	const [image, setImage] = useState(null);
 
 	const schema = yup.object({
 		title: yup.string().required().min(1).max(50),
-		price: yup.string().required(),
+		price: yup.number().required(),
 		description: yup.string().required().max(255),
-		uses: yup.string().required(),
+		uses: yup.number().integer().required(),
 	});
 
 	const MyTextField = ({
@@ -66,11 +88,45 @@ const AddImageModal = () => {
 					<ThemeProvider theme={theme}>
 						<Formik
 							validationSchema={schema}
-							initialValues={{ email: '', password: '' }}
+							initialValues={{
+								title: '',
+								price: '',
+								description: '',
+								uses: '',
+							}}
 							onSubmit={async (data, { setSubmitting }) => {
 								setSubmitting(true);
-								console.log(data);
-								dispatch(login(data));
+								const { title, price, description, uses } = data;
+
+								let { GPSLatitude, GPSLongitude, Model } = await exifr.parse(
+									image,
+									true
+								);
+
+								try {
+									await addImage({
+										variables: {
+											title,
+											price: parseFloat(price),
+											description,
+											uses: parseInt(uses),
+											coordinates: `${GPSLatitude}, ${GPSLongitude}`,
+											camera_type: Model,
+											image_file: image,
+											format: image.type,
+											last_modified: new Date(image.lastModified),
+											size: image.size,
+										},
+										refetchQueries: [
+											{
+												query: GET_IMAGES,
+											},
+										],
+									});
+								} catch (error) {
+									console.log(error);
+								}
+
 								setSubmitting(false);
 							}}
 						>
@@ -113,19 +169,45 @@ const AddImageModal = () => {
 											as={TextField}
 										/>
 									</div>
+									<Dropzone
+										accept={{ 'image/*': ['.jpeg', '.png'] }}
+										maxFiles={1}
+										maxSize={10000000}
+										onDrop={([file]) => {
+											setImage(file);
+										}}
+									>
+										{({ getRootProps, getInputProps }) => (
+											<section>
+												<div {...getRootProps()}>
+													<input {...getInputProps()} />
+													<p>
+														Drag 'n' drop some files here, or click to select
+														files
+													</p>
+												</div>
+											</section>
+										)}
+									</Dropzone>
+									<Modal.Footer>
+										<Button
+											color='primary'
+											disabled={isSubmitting}
+											type='submit'
+											className='form-button'
+											onClick={handleSubmit}
+										>
+											Save Changes
+										</Button>
+										<Button variant='secondary' onClick={handleClose}>
+											Close
+										</Button>
+									</Modal.Footer>
 								</Form>
 							)}
 						</Formik>
 					</ThemeProvider>
 				</Modal.Body>
-				<Modal.Footer>
-					<Button variant='secondary' onClick={handleClose}>
-						Close
-					</Button>
-					<Button variant='primary' onClick={handleClose}>
-						Save Changes
-					</Button>
-				</Modal.Footer>
 			</Modal>
 		</>
 	);

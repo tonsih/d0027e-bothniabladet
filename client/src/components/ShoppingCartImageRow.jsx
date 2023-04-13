@@ -7,6 +7,7 @@ import { getMe, reset } from '../features/auth/authSlice';
 import {
 	SHOPPING_CART_IMAGES,
 	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGE,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import ActionButton from './ActionButton';
@@ -29,6 +30,13 @@ const ShoppingCartImageRow = ({ image, userId }) => {
 				query: USER_SHOPPING_CART,
 				variables: {
 					user_id: userId,
+				},
+			},
+			{
+				query: USER_SHOPPING_CART_IMAGE,
+				variables: {
+					image_id,
+					shopping_cart_id,
 				},
 			},
 		],

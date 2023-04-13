@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const { graphqlHTTP } = require('express-graphql');
+const { graphqlUploadExpress } = require('graphql-upload');
 const schema = require('./schema/schema');
 const session = require('express-session');
 const port = process.env.PORT || 5000;
@@ -43,6 +44,7 @@ app.use(
 
 app.use(
 	'/graphql',
+	graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 100 }),
 	graphqlHTTP(req => ({
 		schema,
 		graphiql: process.env.NODE_ENV === 'development',

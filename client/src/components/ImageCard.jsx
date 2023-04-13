@@ -1,8 +1,13 @@
+import { useSelector } from 'react-redux';
 import { StyledLink } from '../style/styledComponents/StyledLink';
 import ActionButton from './ActionButton';
 
 const ImageCard = ({ image }) => {
 	const { image_id, title, price, uses, description, image_url } = image;
+	const { user, isLoading, isError, isSuccess, message } = useSelector(
+		state => state.auth
+	);
+
 	return (
 		<div className='card h-100'>
 			<StyledLink
@@ -21,7 +26,9 @@ const ImageCard = ({ image }) => {
 				</div>
 				<ul className='list-group list-group-flush'>
 					<li className='list-group-item border-top'>Price: ${price}</li>
-					<li className='list-group-item border-bottom'>No. uses: {uses}</li>
+					{user?.me?.admin && (
+						<li className='list-group-item border-bottom'>No. uses: {uses}</li>
+					)}
 				</ul>
 				<div className='card-body d-flex align-items-end'>
 					<ActionButton

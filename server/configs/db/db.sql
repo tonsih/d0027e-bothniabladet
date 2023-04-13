@@ -33,7 +33,6 @@ create table bothniabladet.shopping_cart(
   constraint fk_user_shopping_cart 
   foreign key(user_id) references bothniabladet.user(user_id)
   on delete cascade
-  on update cascade
 );
 
 alter table bothniabladet.shopping_cart alter total_price set default 0;
@@ -49,7 +48,6 @@ create table bothniabladet.`order`(
   constraint fk_user_order 
   foreign key(user_id) references bothniabladet.user(user_id)
   on delete cascade
-  on update cascade
 );
 
 alter table bothniabladet.`order` alter total_price set default 0;
@@ -64,9 +62,9 @@ create table bothniabladet.tag(
 create table bothniabladet.technical_metadata(
   technical_metadata_id           serial,
   coordinates                     varChar(100),                
-  camera_type                     varchar(100)     unique,
+  camera_type                     varchar(100),
   format                          varchar(100),
-  version                         varchar(100),
+  last_modified                   datetime,
   `size`                          bigint  unsigned,
   width                           bigint  unsigned,
   height                          bigint  unsigned,
@@ -81,6 +79,7 @@ create table bothniabladet.image(
   description                 varchar(300),
   image_url                   varChar(500)  unique,                
   price                       double        unsigned   not null,
+  journalist                  varchar(100),
   uses                        bigint        unsigned   not null,
   distributable               boolean,
 
@@ -89,7 +88,6 @@ create table bothniabladet.image(
   constraint fk_technical_metadata_image
   foreign key(technical_metadata_id) references bothniabladet.technical_metadata(technical_metadata_id)
   on delete set null
-  on update cascade
 );
 
 alter table bothniabladet.image alter image_url set default null;
@@ -102,13 +100,11 @@ create table bothniabladet.image_tag(
 
   constraint fk_image_image_tag 
   foreign key(image_id) references bothniabladet.image(image_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint fk_tag_image_tag
   foreign key(tag_id) references bothniabladet.tag(tag_id)
   on delete cascade
-  on update cascade
 );
 
 create table bothniabladet.order_image(
@@ -119,13 +115,11 @@ create table bothniabladet.order_image(
 
   constraint fk_order_order_image 
   foreign key(order_id) references bothniabladet.`order`(order_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint fk_image_order_image 
   foreign key(image_id) references bothniabladet.image(image_id)
   on delete cascade
-  on update cascade
 );
 
 create table bothniabladet.shopping_cart_image(
@@ -138,13 +132,11 @@ create table bothniabladet.shopping_cart_image(
 
   constraint fk_shopping_cart_shopping_cart_image 
   foreign key(shopping_cart_id) references bothniabladet.shopping_cart(shopping_cart_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint fk_image_shopping_cart_image 
   foreign key(image_id) references bothniabladet.image(image_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint uc_shopping_cart_image unique(shopping_cart_id, image_id)
 );
@@ -166,13 +158,11 @@ create table bothniabladet.image_offer(
 
   constraint fk_image_image_offer
   foreign key(image_id) references bothniabladet.image(image_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint fk_offer_image_offer
   foreign key(offer_id) references bothniabladet.offer(offer_id)
   on delete cascade
-  on update cascade
 );
 
 create table bothniabladet.user_offer(
@@ -183,13 +173,11 @@ create table bothniabladet.user_offer(
 
   constraint fk_user_user_offer
   foreign key(user_id) references bothniabladet.user(user_id)
-  on delete cascade
-  on update cascade,
+  on delete cascade,
 
   constraint fk_offer_user_offer
   foreign key(offer_id) references bothniabladet.offer(offer_id)
   on delete cascade
-  on update cascade
 );
 
 /*

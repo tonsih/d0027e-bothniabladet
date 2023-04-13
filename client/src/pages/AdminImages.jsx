@@ -4,9 +4,20 @@ import ImageRow from '../components/ImageRow';
 import Spinner from '../components/Spinner';
 import { GET_IMAGES } from '../queries/imageQueries';
 import '../scss/AdminImages.scss';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const AdminImages = () => {
+	const navigate = useNavigate();
 	const { data, loading } = useQuery(GET_IMAGES);
+	const { user } = useSelector(state => state.auth);
+
+	useEffect(() => {
+		if (!user || !user.me || user.me.banned || !user.me.admin) {
+			navigate('/');
+		}
+	}, [user, navigate]);
 
 	if (loading) return <Spinner />;
 
@@ -28,9 +39,10 @@ const AdminImages = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data.images.map(image => (
-							<ImageRow image={image} key={image.image_id} />
-						))}
+						{data?.images &&
+							data.images.map(image => (
+								<ImageRow image={image} key={image.image_id} />
+							))}
 					</tbody>
 				</table>
 			</section>

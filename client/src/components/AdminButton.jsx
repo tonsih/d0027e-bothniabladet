@@ -9,7 +9,7 @@ import { theme } from '../style/themes';
 import { Link } from 'react-router-dom';
 import MenuButton from './MenuButton';
 
-export default function MenuPopupState() {
+export default function AdminButton() {
 	return (
 		<PopupState variant='popover' popupId='demo-popup-menu'>
 			{popupState => (

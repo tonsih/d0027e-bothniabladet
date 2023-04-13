@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Spinner from '../components/Spinner';
 import { GET_IMAGE } from '../queries/imageQueries';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -6,18 +6,34 @@ import { FaShoppingCart } from 'react-icons/fa';
 import ActionButton from '../components/ActionButton';
 import { useSelector } from 'react-redux';
 import { ADD_SHOPPING_CART_IMAGE } from '../mutations/shoppingCartMutations';
-import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
+import {
+	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGE,
+	USER_SHOPPING_CART_IMAGES,
+} from '../queries/shoppingCartQueries';
+import { useEffect } from 'react';
 
 const ImagePage = () => {
 	const { image: image_id } = useParams();
+	const { user } = useSelector(state => state.auth);
 	const { error, loading, data } = useQuery(GET_IMAGE, {
 		variables: { image_id },
 	});
-	const [addShoppingCartImage] = useMutation(ADD_SHOPPING_CART_IMAGE, {
-		refetchQueries: [{ query: USER_SHOPPING_CART_IMAGES }],
-	});
 
-	const { user } = useSelector(state => state.auth);
+	const [getSci, { data: sciData }] = useLazyQuery(USER_SHOPPING_CART_IMAGE);
+
+	useEffect(() => {
+		if (image_id && user?.shopping_cart?.shopping_cart_id) {
+			getSci({
+				variables: {
+					image_id,
+					shopping_cart_id: user?.shopping_cart.shopping_cart_id,
+				},
+			});
+		}
+	}, [image_id, getSci, user]);
+
+	const [addShoppingCartImage] = useMutation(ADD_SHOPPING_CART_IMAGE);
 
 	const location = useLocation();
 	const path = location.pathname;
@@ -32,20 +48,50 @@ const ImagePage = () => {
 		navigate('/login');
 	};
 
-	// shopping_cart_id: $shopping_cart_id
-	// image_id: $image_id
-	// time_added: $time_added
-
-	console.log(user?.shopping_cart?.shopping_cart_id);
-
-	const onAddToCart = (shoppingCartId, imageId) => {
+	const onAddToCart = (shoppingCartId, imageId, userId) => {
 		addShoppingCartImage({
 			variables: {
 				shopping_cart_id: shoppingCartId,
 				image_id: imageId,
-				time_added: '2007-12-03T10:15:30Z',
+				time_added: new Date().toISOString(),
 			},
+			refetchQueries: [
+				{
+					query: USER_SHOPPING_CART_IMAGES,
+					variables: {
+						shopping_cart_id: shoppingCartId,
+					},
+				},
+				{
+					query: USER_SHOPPING_CART,
+					variables: {
+						user_id: userId,
+					},
+				},
+				{
+					query: USER_SHOPPING_CART_IMAGE,
+					variables: {
+						image_id: imageId,
+						shopping_cart_id: shoppingCartId,
+					},
+				},
+			],
 		});
+	};
+
+	const ButtonTextHolder = () => {
+		if (user && sciData?.shopping_cart_image_by_image_id) {
+			if (sciData?.shopping_cart_image_by_image_id?.length <= 0) {
+				return (
+					<>
+						<FaShoppingCart className='mr-4' /> Add to Cart
+					</>
+				);
+			} else {
+				return <>Already in shopping cart</>;
+			}
+		}
+		return <>Login to purchase</>;
 	};
 
 	return (
@@ -81,23 +127,22 @@ const ImagePage = () => {
 										variant='outlined'
 										color='primary'
 										className='w-100 p-3'
+										disabled={
+											user &&
+											sciData?.shopping_cart_image_by_image_id?.length > 0
+										}
 										{...(!user?.shopping_cart
 											? { onClick: onClickHandler }
 											: {
 													onClick: () =>
 														onAddToCart(
 															user.shopping_cart.shopping_cart_id,
-															data.image.image_id
+															data.image.image_id,
+															user.me.user_id
 														),
 											  })}
 									>
-										{user ? (
-											<>
-												<FaShoppingCart className='mr-4' /> Add to Cart
-											</>
-										) : (
-											<>Login to purchase</>
-										)}
+										<ButtonTextHolder />
 									</ActionButton>
 								</div>
 							</div>

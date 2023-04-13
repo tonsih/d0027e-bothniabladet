@@ -6,7 +6,6 @@ import {
 	FaShoppingCart,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import MenuPopupState from './AdminButton';
 import MenuButton from './MenuButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe, logout, reset } from '../features/auth/authSlice';
@@ -14,6 +13,8 @@ import { memo, useEffect } from 'react';
 import '../scss/Header.scss';
 import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
 import { useLazyQuery, useQuery } from '@apollo/client';
+import AdminButton from './AdminButton';
+import CategoriesButton from './CategoriesButton';
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -74,9 +75,12 @@ const Header = () => {
 		<>
 			{user?.me?.admin && (
 				<li className='nav-item'>
-					<MenuPopupState />
+					<AdminButton />
 				</li>
 			)}
+			<li className='nav-item'>
+				<CategoriesButton />
+			</li>
 			<li className='nav-item'>
 				<MenuButton
 					onClick={async () => {

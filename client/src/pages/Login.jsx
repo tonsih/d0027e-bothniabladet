@@ -93,7 +93,6 @@ const Login = ({ client }) => {
 						initialValues={{ email: '', password: '' }}
 						onSubmit={async (data, { setSubmitting }) => {
 							setSubmitting(true);
-							console.log(data);
 							dispatch(login(data));
 							setSubmitting(false);
 						}}
