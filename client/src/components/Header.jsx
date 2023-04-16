@@ -78,20 +78,6 @@ const Header = () => {
 					<AdminButton />
 				</li>
 			)}
-			<li className='nav-item'>
-				<CategoriesButton />
-			</li>
-			<li className='nav-item'>
-				<MenuButton
-					onClick={async () => {
-						dispatch(logout());
-						dispatch(reset());
-					}}
-					startIcon={<FaSignOutAlt />}
-				>
-					Logout
-				</MenuButton>
-			</li>
 			{data && (
 				<Link to='/cart'>
 					<li className='nav-item'>
@@ -104,6 +90,17 @@ const Header = () => {
 			<li className='nav-item'>
 				<MenuButton sx={{ textTransform: 'lowercase' }}>
 					{user?.me?.email}
+				</MenuButton>
+			</li>
+			<li className='nav-item'>
+				<MenuButton
+					onClick={async () => {
+						dispatch(logout());
+						dispatch(reset());
+					}}
+					startIcon={<FaSignOutAlt />}
+				>
+					Logout
 				</MenuButton>
 			</li>
 		</>
@@ -120,6 +117,9 @@ const Header = () => {
 						</div>
 					</Link>
 					<ul className='nav navbar-nav ml-auto d-flex flex-row align-items-center justify-content-between'>
+						<li className='nav-item'>
+							<CategoriesButton />
+						</li>
 						<UserLinks />
 					</ul>
 				</div>

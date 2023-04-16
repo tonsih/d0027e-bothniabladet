@@ -17,19 +17,12 @@ export default function CategoriesButton() {
 
 	if (data?.image_tags) {
 		data.image_tags.forEach(element => {
-			categoriesSet.add(element.tag.name);
+			const { image, tag } = element;
+			const { name: tagName } = tag || {};
+			const { uses, distributable } = image || {};
+			if (uses > 0 && distributable) categoriesSet.add(tagName);
 		});
 	}
-
-	const CategoryItems = ({ popupState }) => {
-		if (categoriesSet && categoriesSet.size > 0) {
-			return [...categoriesSet].map(category => {
-				<Link to='/category/'>
-					<MenuItem onClick={popupState.close}>{category}</MenuItem>
-				</Link>;
-			});
-		}
-	};
 
 	return (
 		<>

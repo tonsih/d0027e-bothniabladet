@@ -1,5 +1,6 @@
 drop database if exists bothniabladet;
 create database bothniabladet;
+use bothniabladet;
 
 create table bothniabladet.user(
   user_id     serial,
@@ -51,6 +52,9 @@ create table bothniabladet.`order`(
 );
 
 alter table bothniabladet.`order` alter total_price set default 0;
+
+alter table `bothniabladet`.`order` modify `order_date` timestamp not null default current_timestamp on update current_timestamp;
+set time_zone = 'Europe/Stockholm';
 
 create table bothniabladet.tag(
   tag_id          serial,
@@ -201,20 +205,20 @@ insert into bothniabladet.tag
 insert into bothniabladet.image
 (title,              price,     uses,   description,                distributable) values 
 ("mount everest",    13,        6,      "highest mountain",         true),
-("haaaa",            33.33,     3,      "ha ha he he",              false),
-("kubi",    	       2,	        9,      "cubism at it's finest",    false);
+("haaaa",            33.33,     0,      "ha ha he he",              false),
+("kubi",    	       2,	        3,      "cubism at it's finest",    true);
 
 insert into bothniabladet.shopping_cart_image
 (shopping_cart_id,  image_id,    time_added) values 
 (1,                   1,         now()),
-(1,                   2,         now()),
 (1,                   3,         now());
 
 insert into bothniabladet.image_tag
 (image_id, tag_id) values 
 (1,        1),
 (2,        2),
-(3,        3);
+(3,        3),
+(3,        2);
 
 delimiter $$
 /*

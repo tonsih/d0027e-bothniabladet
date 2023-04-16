@@ -13,11 +13,13 @@ const ADD_IMAGE = gql`
 		$uses: Int!
 		$image_file: Upload
 		$description: String
+		$journalist: String
 		$coordinates: String
 		$camera_type: String
 		$format: String
 		$last_modified: DateTime
 		$size: Int
+		$distributable: Boolean
 	) {
 		addImage(
 			title: $title
@@ -25,11 +27,13 @@ const ADD_IMAGE = gql`
 			uses: $uses
 			image_file: $image_file
 			description: $description
+			journalist: $journalist
 			coordinates: $coordinates
 			camera_type: $camera_type
 			format: $format
 			last_modified: $last_modified
 			size: $size
+			distributable: $distributable
 		) {
 			technical_metadata {
 				technical_metadata_id
@@ -39,6 +43,8 @@ const ADD_IMAGE = gql`
 			uses
 			image_url
 			description
+			distributable
+			journalist
 		}
 	}
 `;
@@ -84,6 +90,8 @@ const UPDATE_IMAGE = gql`
 		$uses: Int
 		$image_url: String
 		$description: String
+		$journalist: String
+		$distributable: Boolean
 	) {
 		updateImage(
 			image_id: $image_id
@@ -92,6 +100,8 @@ const UPDATE_IMAGE = gql`
 			uses: $uses
 			image_url: $image_url
 			description: $description
+			journalist: $journalist
+			distributable: $distributable
 		) {
 			image_id
 			title
@@ -99,6 +109,8 @@ const UPDATE_IMAGE = gql`
 			uses
 			image_url
 			description
+			journalist
+			distributable
 		}
 	}
 `;

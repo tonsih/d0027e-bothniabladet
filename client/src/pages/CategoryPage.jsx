@@ -19,14 +19,18 @@ const CategoryPage = () => {
 				{!loading &&
 					!error &&
 					data?.images_by_tag_name &&
-					data?.images_by_tag_name.map(image => (
-						<div
-							className='col-sm-12 col-md-6 col-lg-4 col-xl-4 pb-3'
-							key={image.image_id}
-						>
-							<ImageCard key={image.image_id} image={image} />
-						</div>
-					))}
+					data?.images_by_tag_name.map(
+						image =>
+							image.uses > 0 &&
+							image.distributable && (
+								<div
+									className='col-sm-12 col-md-6 col-lg-4 col-xl-4 pb-3'
+									key={image.image_id}
+								>
+									<ImageCard key={image.image_id} image={image} />
+								</div>
+							)
+					)}
 			</div>
 		</>
 	);

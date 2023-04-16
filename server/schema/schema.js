@@ -11,7 +11,7 @@ const {
 } = require('graphql');
 const { GraphQLDateTime } = require('graphql-scalars');
 const { GraphQLUpload } = require('graphql-upload');
-const { models } = require('../configs/db/db');
+const { models, sequelize } = require('../configs/db/db');
 const {
 	user,
 	tag,
@@ -29,6 +29,9 @@ const {
 const { createWriteStream, unlinkSync, existsSync } = require('fs');
 const sizeOf = require('image-size');
 const exifr = require('exifr');
+const mime = require('mime-types');
+const moment = require('moment-timezone');
+const { DateTime } = require('luxon');
 
 const bcrypt = require('bcryptjs');
 const path = require('path');
@@ -89,6 +92,8 @@ const ImageType = new GraphQLObjectType({
 			},
 		},
 		description: { type: GraphQLString },
+		journalist: { type: GraphQLString },
+		distributable: { type: GraphQLBoolean },
 	}),
 });
 
@@ -242,16 +247,19 @@ const RootQuery = new GraphQLObjectType({
 		me: {
 			type: UserType,
 			async resolve(_, __, { session }) {
-				const user_id = session.userId;
-				let matchedUser;
+				if (session) {
+					console.log(session);
+					const { userId } = session;
+					let matchedUser;
 
-				if (user_id) {
-					matchedUser = await user.findOne({
-						where: { user_id },
-					});
+					if (userId) {
+						matchedUser = await user.findOne({
+							where: { user_id: userId },
+						});
+					}
+
+					return matchedUser;
 				}
-
-				return matchedUser;
 			},
 		},
 		tag: {
@@ -339,7 +347,7 @@ const RootQuery = new GraphQLObjectType({
 		},
 		shopping_cart: {
 			type: ShoppingCartType,
-			async resolve(_, args, { session }) {
+			async resolve(_, __, { session }) {
 				return await shopping_cart.findOne({
 					where: { user_id: session.userId },
 				});
@@ -449,6 +457,22 @@ const RootQuery = new GraphQLObjectType({
 				return await technical_metadata.findByPk(args.technical_metadata_id);
 			},
 		},
+		technical_metadata_by_image_id: {
+			type: TechnicalMetadataType,
+			args: { image_id: { type: GraphQLID } },
+			async resolve(_, { image_id }) {
+				const img = await image.findOne({ where: { image_id } });
+				const { technical_metadata_id } = img?.dataValues ?? {
+					technical_metadata_id: null,
+				};
+				if (technical_metadata_id) {
+					return await technical_metadata.findOne({
+						where: { technical_metadata_id },
+					});
+				}
+				return null;
+			},
+		},
 	},
 });
 
@@ -515,6 +539,8 @@ const mutation = new GraphQLObjectType({
 					throw new Error('Wrong password');
 
 				session.userId = matchedUser.user_id;
+
+				console.log(session);
 
 				return matchedUser;
 			},
@@ -603,44 +629,63 @@ const mutation = new GraphQLObjectType({
 				{ url }
 			) {
 				try {
-					const { filename, mimetype, createReadStream } = await image_file;
+					let tm;
 
-					const tm = await technical_metadata.create({
-						coordinates,
-						camera_type,
-						format,
-						last_modified,
-						size,
-					});
-
-					let imgPath = path.join(__dirname, '..', '/images', filename);
-
-					let stream = await createReadStream().pipe(
-						createWriteStream(imgPath)
-					);
-
-					stream.on('finish', async () => {
-						sizeOf(imgPath, async (err, { width, height }) => {
-							await technical_metadata.update(
-								{
-									width,
-									height,
-								},
-								{ where: { technical_metadata_id: tm.technical_metadata_id } }
-							);
+					if (coordinates || camera_type || format || last_modified || size) {
+						tm = await technical_metadata.create({
+							coordinates: coordinates || null,
+							camera_type: camera_type || null,
+							format: format || null,
+							last_modified: last_modified || null,
+							size: size || null,
 						});
-					});
+					}
 
-					return await image.create({
-						technical_metadata_id: tm.technical_metadata_id,
+					const img = await image.create({
+						technical_metadata_id: tm?.technical_metadata_id || null,
 						title,
 						price,
 						uses,
-						image_url: filename,
 						distributable,
 						journalist,
 						description,
 					});
+
+					if (image_file) {
+						const { mimetype, createReadStream } = await image_file;
+						const filename = img?.image_id + '.' + mime.extension(mimetype);
+						let imgPath = path.join(__dirname, '..', '/images', filename);
+						let stream = await createReadStream().pipe(
+							createWriteStream(imgPath)
+						);
+
+						stream.on('finish', async () => {
+							if (tm) {
+								sizeOf(imgPath, async (err, { width, height }) => {
+									await technical_metadata.update(
+										{
+											width,
+											height,
+										},
+										{
+											where: {
+												technical_metadata_id: tm?.technical_metadata_id,
+											},
+										}
+									);
+								});
+							}
+
+							await image.update(
+								{
+									image_url: filename,
+								},
+								{ where: { image_id: img?.image_id } }
+							);
+						});
+					}
+
+					return img;
 				} catch (error) {
 					console.log(error);
 				}
@@ -689,6 +734,65 @@ const mutation = new GraphQLObjectType({
 					order_id,
 					image_id,
 				});
+			},
+		},
+		createOrder: {
+			type: OrderType,
+			async resolve(_, __, { session }) {
+				try {
+					if (session?.userId) {
+						const sc = await shopping_cart.findOne({
+							where: { user_id: session.userId },
+						});
+
+						const sci = await shopping_cart_image.findAll({
+							where: {
+								shopping_cart_id: sc.shopping_cart_id,
+							},
+						});
+
+						const orderDate = DateTime.now()
+							.setZone('Europe/Stockholm')
+							.toJSDate()
+							.toLocaleString('en-US', { timeZone: 'Europe/Stockholm' });
+
+						const isoOrderDate = new Date(orderDate);
+						isoOrderDate.setHours(isoOrderDate.getHours() + 2);
+						const isoString = isoOrderDate.toISOString();
+
+						const ord = await order.create({
+							user_id: session.userId,
+							order_date: isoString,
+						});
+
+						await sequelize.transaction(async t => {
+							for (const cartImg of sci) {
+								const { image_id, shopping_cart_image_id } =
+									cartImg?.dataValues;
+
+								await order_image.create(
+									{
+										order_id: ord.order_id,
+										image_id,
+									},
+									{ transaction: t }
+								);
+
+								await shopping_cart_image.destroy({
+									where: {
+										shopping_cart_image_id,
+									},
+									transaction: t,
+								});
+							}
+						});
+
+						return ord;
+					}
+					return null;
+				} catch (error) {
+					console.log(error);
+				}
 			},
 		},
 		addShoppingCart: {

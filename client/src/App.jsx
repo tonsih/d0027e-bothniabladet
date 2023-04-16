@@ -21,10 +21,11 @@ import CategoryPage from './pages/CategoryPage';
 import { createUploadLink } from 'apollo-upload-client';
 
 export const client = new ApolloClient({
-	// uri: 'http://localhost:5000/graphql',
-	link: createUploadLink({ uri: 'http://localhost:5000/graphql' }),
+	link: createUploadLink({
+		uri: 'http://localhost:5000/graphql',
+		credentials: 'include',
+	}),
 	cache: new InMemoryCache(),
-	credentials: 'include',
 });
 
 const App = () => {

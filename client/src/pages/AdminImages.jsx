@@ -32,8 +32,11 @@ const AdminImages = () => {
 							<th scope='col'>Image</th>
 							<th scope='col'>Title</th>
 							<th scope='col'>Price</th>
+							<th scope='col'>Distributable</th>
 							<th scope='col'>Uses</th>
 							<th scope='col'>Description</th>
+							<th scope='col'>Journalist</th>
+							<th scope='col'>View Metadata</th>
 							<th scope='col'>Edit</th>
 							<th scope='col'>Delete</th>
 						</tr>

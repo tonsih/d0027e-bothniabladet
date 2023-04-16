@@ -1,30 +1,32 @@
-const DataTypes = require('sequelize').DataTypes;
-const _image = require('./image');
-const _image_offer = require('./image_offer');
-const _image_tag = require('./image_tag');
-const _offer = require('./offer');
-const _order = require('./order');
-const _order_image = require('./order_image');
-const _shopping_cart = require('./shopping_cart');
-const _shopping_cart_image = require('./shopping_cart_image');
-const _tag = require('./tag');
-const _technical_metadata = require('./technical_metadata');
-const _user = require('./user');
-const _user_offer = require('./user_offer');
+const DataTypes = require("sequelize").DataTypes;
+const _Sessions = require("./Sessions");
+const _image = require("./image");
+const _image_offer = require("./image_offer");
+const _image_tag = require("./image_tag");
+const _offer = require("./offer");
+const _order = require("./order");
+const _order_image = require("./order_image");
+const _shopping_cart = require("./shopping_cart");
+const _shopping_cart_image = require("./shopping_cart_image");
+const _tag = require("./tag");
+const _technical_metadata = require("./technical_metadata");
+const _user = require("./user");
+const _user_offer = require("./user_offer");
 
 function initModels(sequelize) {
-	const image = _image(sequelize, DataTypes);
-	const image_offer = _image_offer(sequelize, DataTypes);
-	const image_tag = _image_tag(sequelize, DataTypes);
-	const offer = _offer(sequelize, DataTypes);
-	const order = _order(sequelize, DataTypes);
-	const order_image = _order_image(sequelize, DataTypes);
-	const shopping_cart = _shopping_cart(sequelize, DataTypes);
-	const shopping_cart_image = _shopping_cart_image(sequelize, DataTypes);
-	const tag = _tag(sequelize, DataTypes);
-	const technical_metadata = _technical_metadata(sequelize, DataTypes);
-	const user = _user(sequelize, DataTypes);
-	const user_offer = _user_offer(sequelize, DataTypes);
+  const Sessions = _Sessions(sequelize, DataTypes);
+  const image = _image(sequelize, DataTypes);
+  const image_offer = _image_offer(sequelize, DataTypes);
+  const image_tag = _image_tag(sequelize, DataTypes);
+  const offer = _offer(sequelize, DataTypes);
+  const order = _order(sequelize, DataTypes);
+  const order_image = _order_image(sequelize, DataTypes);
+  const shopping_cart = _shopping_cart(sequelize, DataTypes);
+  const shopping_cart_image = _shopping_cart_image(sequelize, DataTypes);
+  const tag = _tag(sequelize, DataTypes);
+  const technical_metadata = _technical_metadata(sequelize, DataTypes);
+  const user = _user(sequelize, DataTypes);
+  const user_offer = _user_offer(sequelize, DataTypes);
 
 	image.belongsToMany(offer, {
 		as: 'offer_id_offers',
@@ -151,20 +153,21 @@ function initModels(sequelize) {
 	user_offer.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
 	user.hasMany(user_offer, { as: 'user_offers', foreignKey: 'user_id' });
 
-	return {
-		image,
-		image_offer,
-		image_tag,
-		offer,
-		order,
-		order_image,
-		shopping_cart,
-		shopping_cart_image,
-		tag,
-		technical_metadata,
-		user,
-		user_offer,
-	};
+  return {
+    Sessions,
+    image,
+    image_offer,
+    image_tag,
+    offer,
+    order,
+    order_image,
+    shopping_cart,
+    shopping_cart_image,
+    tag,
+    technical_metadata,
+    user,
+    user_offer,
+  };
 }
 module.exports = initModels;
 module.exports.initModels = initModels;

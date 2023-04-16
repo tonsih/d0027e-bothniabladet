@@ -1,15 +1,42 @@
-import { useMutation } from '@apollo/client';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useMutation, useQuery } from '@apollo/client';
+import {
+	FaCheck,
+	FaCheckCircle,
+	FaCross,
+	FaEdit,
+	FaInfoCircle,
+	FaTrash,
+} from 'react-icons/fa';
 import { DELETE_IMAGE } from '../mutations/imageMutations';
-import { GET_IMAGES } from '../queries/imageQueries';
+import { GET_IMAGES, GET_TECHNICAL_METADATA } from '../queries/imageQueries';
 import { USER_SHOPPING_CART_IMAGE } from '../queries/shoppingCartQueries';
 import ActionButton from './ActionButton';
+import MetadataModal from './MetadataModal';
 
 const ImageRow = ({ image }) => {
-	const { image_id, image_url, title, price, uses, description } = image;
+	const {
+		image_id,
+		image_url,
+		title,
+		price,
+		uses,
+		description,
+		journalist,
+		distributable,
+	} = image;
 	const [deleteImage] = useMutation(DELETE_IMAGE, {
 		refetchQueries: [{ query: GET_IMAGES }],
 	});
+
+	const {
+		data: tmData,
+		error,
+		loading,
+	} = useQuery(GET_TECHNICAL_METADATA, {
+		variables: { image_id },
+	});
+
+	console.log(tmData?.technical_metadata_by_image_id?.technical_metadata_id);
 
 	return (
 		<>
@@ -23,8 +50,15 @@ const ImageRow = ({ image }) => {
 				</td>
 				<td>{title}</td>
 				<td>${price}</td>
+				<td>{distributable && <FaCheckCircle />}</td>
 				<td>{uses}</td>
 				<td>{description}</td>
+				<td>{journalist || '\u2014'}</td>
+				<td>
+					{tmData?.technical_metadata_by_image_id?.technical_metadata_id && (
+						<MetadataModal metadata={tmData?.technical_metadata_by_image_id} />
+					)}
+				</td>
 				<td>
 					<ActionButton variant='contained' color='secondary' className='btn'>
 						<h6 className='p-0 m-0'>

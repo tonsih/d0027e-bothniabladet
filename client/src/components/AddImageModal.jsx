@@ -2,16 +2,23 @@ import { Field, Form, Formik, useField } from 'formik';
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton';
 import * as yup from 'yup';
-import { TextareaAutosize, TextField, ThemeProvider } from '@mui/material';
+import {
+	Checkbox,
+	TextareaAutosize,
+	TextField,
+	ThemeProvider,
+} from '@mui/material';
 import { theme } from '../style/themes';
 import { ADD_IMAGE, ADD_TECHNICAL_METADATA } from '../mutations/imageMutations';
 import { gql, useMutation } from '@apollo/client';
 import { GET_IMAGES } from '../queries/imageQueries';
 import Dropzone from 'react-dropzone';
 import exifr from 'exifr';
+import '../scss/AddImageModal.scss';
+import { DateTime } from 'luxon';
 
 const AddImageModal = () => {
 	const uploadFileMutation = gql`
@@ -27,20 +34,23 @@ const AddImageModal = () => {
 		ADD_TECHNICAL_METADATA
 	);
 	const [show, setShow] = useState(false);
+	const [distributable, setDistributable] = useState(false);
 
-	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
-	const handleSubmit = () => {
-		handleClose();
+	const handleClose = () => {
+		setShow(false);
+		setImage(null);
+		setDistributable(false);
 	};
+	const handleShow = () => setShow(true);
 
 	const [image, setImage] = useState(null);
 
 	const schema = yup.object({
 		title: yup.string().required().min(1).max(50),
-		price: yup.number().required(),
-		description: yup.string().required().max(255),
-		uses: yup.number().integer().required(),
+		price: yup.number().required().positive(),
+		description: yup.string().max(255),
+		uses: yup.number().integer().positive(),
+		journalist: yup.string().required().max(255),
 	});
 
 	const MyTextField = ({
@@ -92,30 +102,61 @@ const AddImageModal = () => {
 								title: '',
 								price: '',
 								description: '',
-								uses: '',
+								uses: 1,
+								journalist: '',
 							}}
 							onSubmit={async (data, { setSubmitting }) => {
 								setSubmitting(true);
-								const { title, price, description, uses } = data;
+								const { title, price, description, uses, journalist } = data;
 
-								let { GPSLatitude, GPSLongitude, Model } = await exifr.parse(
-									image,
-									true
-								);
+								let GPSLatitude, GPSLongitude, Model;
+
+								if (image) {
+									({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
+										image,
+										true
+									));
+								}
 
 								try {
+									const imageModifiedDate = image?.lastModified
+										? DateTime.fromMillis(image.lastModified)
+												.setZone('Europe/Stockholm')
+												.toJSDate()
+												.toLocaleString('en-US', {
+													timeZone: 'Europe/Stockholm',
+												})
+										: null;
+
+									const isoModifiedDate = imageModifiedDate
+										? new Date(imageModifiedDate)
+										: null;
+									if (isoModifiedDate) {
+										isoModifiedDate.setHours(isoModifiedDate.getHours() + 2);
+									}
+									const isoModifiedDateString = isoModifiedDate
+										? isoModifiedDate.toISOString()
+										: null;
+
 									await addImage({
 										variables: {
 											title,
-											price: parseFloat(price),
+											price: price ? parseFloat(price) : null,
 											description,
-											uses: parseInt(uses),
-											coordinates: `${GPSLatitude}, ${GPSLongitude}`,
+											uses: uses && distributable ? parseInt(uses) : 0,
+											journalist,
+											distributable,
+											coordinates:
+												GPSLatitude && GPSLongitude
+													? `${GPSLatitude}, ${GPSLongitude}`
+													: null,
 											camera_type: Model,
-											image_file: image,
-											format: image.type,
-											last_modified: new Date(image.lastModified),
-											size: image.size,
+											image_file: image || null,
+											format: image?.type || null,
+											last_modified: image?.lastModified
+												? isoModifiedDateString
+												: null,
+											size: image?.size || null,
 										},
 										refetchQueries: [
 											{
@@ -128,6 +169,7 @@ const AddImageModal = () => {
 								}
 
 								setSubmitting(false);
+								handleClose();
 							}}
 						>
 							{({ values, isSubmitting }) => (
@@ -160,42 +202,76 @@ const AddImageModal = () => {
 											rows={4}
 										/>
 									</div>
+									<div className='checkboxfield'>
+										Distributable:
+										<Checkbox
+											onChange={e => {
+												setDistributable(e.target.checked);
+											}}
+										/>
+									</div>
+									{distributable && (
+										<div className='textfield'>
+											<MyTextField
+												name='uses'
+												label='uses'
+												placeholder='uses'
+												type='input'
+												as={TextField}
+											/>
+										</div>
+									)}
 									<div className='textfield'>
 										<MyTextField
-											name='uses'
-											label='uses'
-											placeholder='uses'
+											name='journalist'
+											label='journalist'
+											placeholder='journalist'
 											type='input'
 											as={TextField}
 										/>
 									</div>
-									<Dropzone
-										accept={{ 'image/*': ['.jpeg', '.png'] }}
-										maxFiles={1}
-										maxSize={10000000}
-										onDrop={([file]) => {
-											setImage(file);
-										}}
-									>
-										{({ getRootProps, getInputProps }) => (
-											<section>
-												<div {...getRootProps()}>
-													<input {...getInputProps()} />
-													<p>
-														Drag 'n' drop some files here, or click to select
-														files
-													</p>
-												</div>
-											</section>
-										)}
-									</Dropzone>
+									{!image ? (
+										<Dropzone
+											accept={{ 'image/*': ['.jpeg', '.png'] }}
+											maxFiles={1}
+											maxSize={10000000}
+											onDrop={([file]) => {
+												setImage(file);
+											}}
+										>
+											{({ getRootProps, getInputProps }) => (
+												<section>
+													<div {...getRootProps()}>
+														<input {...getInputProps()} />
+														<p className='dropzone-field'>
+															Drag 'n' drop some files here, or click to select
+															files
+														</p>
+													</div>
+												</section>
+											)}
+										</Dropzone>
+									) : (
+										<>
+											<div className='imageUpload'>
+												{image?.name}
+												<Button
+													variant='secondary'
+													onClick={() => {
+														setImage(null);
+													}}
+												>
+													<FaTrash />
+												</Button>
+											</div>
+										</>
+									)}
 									<Modal.Footer>
 										<Button
 											color='primary'
 											disabled={isSubmitting}
 											type='submit'
 											className='form-button'
-											onClick={handleSubmit}
 										>
 											Save Changes
 										</Button>

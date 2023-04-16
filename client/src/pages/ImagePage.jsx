@@ -12,6 +12,7 @@ import {
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import { useEffect } from 'react';
+import moment from 'moment-timezone';
 
 const ImagePage = () => {
 	const { image: image_id } = useParams();
@@ -27,7 +28,7 @@ const ImagePage = () => {
 			getSci({
 				variables: {
 					image_id,
-					shopping_cart_id: user?.shopping_cart.shopping_cart_id,
+					shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
 				},
 			});
 		}
@@ -53,7 +54,7 @@ const ImagePage = () => {
 			variables: {
 				shopping_cart_id: shoppingCartId,
 				image_id: imageId,
-				time_added: new Date().toISOString(),
+				time_added: moment().tz('Europe/Stockholm'),
 			},
 			refetchQueries: [
 				{

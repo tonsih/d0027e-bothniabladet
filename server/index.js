@@ -25,13 +25,15 @@ app.use(
 	})
 );
 
+const store = new SequelizeStore({
+	db,
+});
+
 app.use(
 	session({
 		name: 'sid',
 		secret: process.env.SESSION_SECRET,
-		store: new SequelizeStore({
-			db,
-		}),
+		store,
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
@@ -41,6 +43,8 @@ app.use(
 		},
 	})
 );
+
+store.sync();
 
 app.use(
 	'/graphql',
