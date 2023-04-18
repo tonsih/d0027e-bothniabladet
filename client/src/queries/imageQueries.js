@@ -15,6 +15,28 @@ const GET_IMAGES = gql`
 	}
 `;
 
+const GET_LATEST_VERSION_IMAGES = gql`
+	query latest_version_images {
+		latest_version_images {
+			version_id
+			version_no
+			original {
+				image_id
+			}
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+			}
+		}
+	}
+`;
+
 const GET_IMAGE_TAGS = gql`
 	query image_tags {
 		image_tags {
@@ -26,6 +48,17 @@ const GET_IMAGE_TAGS = gql`
 				image_id
 				uses
 				distributable
+			}
+		}
+	}
+`;
+
+const GET_IMAGE_TAGS_BY_IMAGE_ID = gql`
+	query image_tags_by_image_id($image_id: ID!) {
+		image_tags_by_image_id(image_id: $image_id) {
+			tag {
+				tag_id
+				name
 			}
 		}
 	}
@@ -78,8 +111,10 @@ const GET_TECHNICAL_METADATA = gql`
 
 export {
 	GET_IMAGES,
+	GET_LATEST_VERSION_IMAGES,
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
+	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_IMAGE,
 	GET_TECHNICAL_METADATA,
 };

@@ -19,7 +19,7 @@ class shopping_cart extends Sequelize.Model {
         model: 'user',
         key: 'user_id'
       },
-      unique: "shopping_cart_ibfk_1"
+      unique: "fk_user_shopping_cart"
     },
     total_price: {
       type: DataTypes.DOUBLE,

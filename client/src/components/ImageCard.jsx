@@ -19,7 +19,7 @@ const ImageCard = ({ image }) => {
 					className='card-img-top'
 					alt={image_id}
 					src={image_url || 'https://placehold.co/500x400'}
-				></img>
+				/>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>
 					<p className='card-text fs-6'>{description}</p>

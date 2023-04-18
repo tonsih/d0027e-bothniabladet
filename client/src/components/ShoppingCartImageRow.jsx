@@ -35,7 +35,7 @@ const ShoppingCartImageRow = ({ image, userId }) => {
 			{
 				query: USER_SHOPPING_CART_IMAGE,
 				variables: {
-					image_id,
+					image_ids: image_id,
 					shopping_cart_id,
 				},
 			},
@@ -56,7 +56,6 @@ const ShoppingCartImageRow = ({ image, userId }) => {
 				</td>
 				<td>{title}</td>
 				<td>${price}</td>
-				<td>{uses}</td>
 				<td>{description}</td>
 				<td>
 					<ActionButton

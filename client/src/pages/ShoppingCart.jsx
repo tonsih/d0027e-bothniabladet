@@ -4,12 +4,20 @@ import { useSelector } from 'react-redux';
 import ShoppingCartImageRow from '../components/ShoppingCartImageRow';
 import {
 	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGE,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import { Button } from '@mui/material';
 import { CREATE_ORDER } from '../mutations/orderMutations';
+import {
+	GET_IMAGE_TAGS,
+	GET_LATEST_VERSION_IMAGES,
+} from '../queries/imageQueries';
+import { useNavigate } from 'react-router-dom';
 
 const ShoppingCart = () => {
+	const navigate = useNavigate();
+
 	const { user, isLoading, isError, isSuccess, message } = useSelector(
 		state => state.auth
 	);
@@ -17,6 +25,14 @@ const ShoppingCart = () => {
 	const [getScImgs, { data, loading, error }] = useLazyQuery(
 		USER_SHOPPING_CART_IMAGES
 	);
+
+	const imageIds = [];
+
+	if (data?.shopping_cart_images_by_sc_id) {
+		for (const sci of data?.shopping_cart_images_by_sc_id) {
+			imageIds.push(sci?.image?.image_id);
+		}
+	}
 
 	const [getSc, { data: scData }] = useLazyQuery(USER_SHOPPING_CART);
 
@@ -43,7 +59,6 @@ const ShoppingCart = () => {
 							<th scope='col'>Image</th>
 							<th scope='col'>Title</th>
 							<th scope='col'>Price</th>
-							<th scope='col'>Uses</th>
 							<th scope='col'>Description</th>
 							<th scope='col'>Delete</th>
 						</tr>
@@ -73,7 +88,16 @@ const ShoppingCart = () => {
 									<Button
 										onClick={async () => {
 											try {
-												const order = await createOrder({
+												const refetchQueries = imageIds.map(imageId => ({
+													query: USER_SHOPPING_CART_IMAGE,
+													variables: {
+														shopping_cart_id:
+															user.shopping_cart.shopping_cart_id,
+														image_ids: imageId,
+													},
+												}));
+
+												const createdOrder = await createOrder({
 													refetchQueries: [
 														{
 															query: USER_SHOPPING_CART,
@@ -88,11 +112,23 @@ const ShoppingCart = () => {
 																	user.shopping_cart.shopping_cart_id,
 															},
 														},
+														...refetchQueries,
+														{
+															query: GET_LATEST_VERSION_IMAGES,
+														},
+														{
+															query: GET_IMAGE_TAGS,
+														},
 													],
 												});
 
-												console.log(order?.createOrder?.order_id);
-											} catch (error) {}
+												if (createdOrder?.data?.createOrder?.order_id)
+													navigate(
+														`/order/${createdOrder?.data?.createOrder?.order_id}`
+													);
+											} catch (error) {
+												console.log(error);
+											}
 										}}
 									>
 										Order

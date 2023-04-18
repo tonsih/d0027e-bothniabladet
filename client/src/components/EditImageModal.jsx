@@ -1,8 +1,8 @@
 import { Field, Form, Formik, useField } from 'formik';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton';
 import * as yup from 'yup';
 import {
@@ -16,11 +16,14 @@ import {
 	ADD_IMAGE,
 	ADD_TECHNICAL_METADATA,
 	CREATE_IMAGE_TAG,
+	DELETE_IMAGE_TAG,
+	UPDATE_IMAGE,
 } from '../mutations/imageMutations';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import {
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
+	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
 } from '../queries/imageQueries';
 import Dropzone from 'react-dropzone';
@@ -94,25 +97,43 @@ const MyTagTextField = ({
 	);
 };
 
-const AddImageModal = () => {
-	const uploadFileMutation = gql`
-		mutation ($file: Upload!) {
-			uploadFile(file: $file)
-		}
-	`;
+const EditImageModal = ({ imageToEdit }) => {
+	const {
+		image_id,
+		title,
+		price,
+		uses,
+		image_url,
+		description,
+		distributable: imgDistributable,
+		journalist,
+	} = imageToEdit;
 
-	const [uploadFile] = useMutation(uploadFileMutation);
+	const { data: itsData } = useQuery(GET_IMAGE_TAGS_BY_IMAGE_ID, {
+		variables: {
+			image_id,
+		},
+	});
 
-	const [addImage, { data: imgData }] = useMutation(ADD_IMAGE);
-	const [addTechnicalMetadata, { data: tmData }] = useMutation(
-		ADD_TECHNICAL_METADATA
-	);
+	const [updateImage, { data: imgData }] = useMutation(UPDATE_IMAGE);
 
-	const [createImageTag, { data: itData }] = useMutation(CREATE_IMAGE_TAG);
+	const [createImageTag] = useMutation(CREATE_IMAGE_TAG);
+	const [deleteImageTag] = useMutation(DELETE_IMAGE_TAG);
 	const [show, setShow] = useState(false);
-	const [distributable, setDistributable] = useState(false);
+	const [distributable, setDistributable] = useState(imgDistributable);
 	const [tags, setTags] = useState(new Set());
 	const [tagInputValue, setTagInputValue] = useState('');
+
+	const tagsSet = new Set();
+
+	useEffect(() => {
+		if (itsData?.image_tags_by_image_id && show) {
+			for (const imgTag of itsData?.image_tags_by_image_id) {
+				tagsSet.add(imgTag?.tag?.name);
+			}
+		}
+		setTags(new Set(tagsSet));
+	}, [itsData, show]);
 
 	const handleAddTag = tag => {
 		if (!isEmpty(tag)) {
@@ -133,9 +154,7 @@ const AddImageModal = () => {
 		setShow(false);
 		setImage(null);
 		setThumbnail(null);
-		setDistributable(false);
 		setTagInputValue('');
-		setTags(new Set());
 	};
 	const handleShow = () => setShow(true);
 
@@ -154,7 +173,7 @@ const AddImageModal = () => {
 		title: yup.string().required().min(1).max(50),
 		price: yup.number().required().positive(),
 		description: yup.string().max(255),
-		uses: yup.number().integer().positive(),
+		uses: yup.number().integer().positive().min(0),
 		journalist: yup.string().max(255),
 	});
 
@@ -162,28 +181,26 @@ const AddImageModal = () => {
 		<>
 			<ActionButton
 				variant='contained'
-				color='green'
-				startIcon={<FaPlus />}
-				className='btn p-3'
+				className='btn p-2'
 				onClick={handleShow}
 			>
-				<h6 className='p-0 m-0'>Add Image</h6>
+				<FaEdit />
 			</ActionButton>
 
 			<Modal show={show} onHide={handleClose}>
 				<Modal.Header closeButton>
-					<Modal.Title>Add Image</Modal.Title>
+					<Modal.Title>Edit Image</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className='d-flex justify-content-center'>
 					<ThemeProvider theme={theme}>
 						<Formik
 							validationSchema={schema}
 							initialValues={{
-								title: '',
-								price: '',
-								description: '',
-								uses: 1,
-								journalist: '',
+								title: title || '',
+								price: price || '',
+								description: description || '',
+								uses: uses || uses >= 0 ? uses : '',
+								journalist: journalist || '',
 							}}
 							onSubmit={async (data, { setSubmitting }) => {
 								setSubmitting(true);
@@ -218,8 +235,9 @@ const AddImageModal = () => {
 										? isoModifiedDate.toISOString()
 										: null;
 
-									const addedImage = await addImage({
+									const newImage = await updateImage({
 										variables: {
+											image_id: parseInt(image_id),
 											title,
 											price: price ? parseFloat(price) : null,
 											description,
@@ -245,12 +263,13 @@ const AddImageModal = () => {
 										],
 									});
 
-									const { image_id } = addedImage?.data?.addImage;
+									const { image_id: new_image_id } =
+										newImage?.data?.updateImage;
 
 									for (const tagName of Array.from(tags)) {
 										await createImageTag({
 											variables: {
-												image_id,
+												image_id: new_image_id,
 												name: tagName,
 											},
 											refetchQueries: [
@@ -360,6 +379,7 @@ const AddImageModal = () => {
 									<div className='checkboxfield'>
 										Distributable:
 										<Checkbox
+											checked={distributable}
 											onChange={e => {
 												setDistributable(e.target.checked);
 											}}
@@ -433,6 +453,19 @@ const AddImageModal = () => {
 											</div>
 										</>
 									)}
+
+									{image_url && (
+										<div className='current-img'>
+											<div className='image-preview p-2'>
+												<span>Current Image</span>
+												<img
+													src={image_url}
+													className='current-img-thumbnail img-thumbnail'
+													alt='Current image thumbnail'
+												/>
+											</div>
+										</div>
+									)}
 									<Modal.Footer>
 										<Button
 											color='primary'
@@ -455,4 +488,4 @@ const AddImageModal = () => {
 		</>
 	);
 };
-export default AddImageModal;
+export default EditImageModal;

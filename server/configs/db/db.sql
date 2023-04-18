@@ -79,9 +79,9 @@ create table bothniabladet.technical_metadata(
 create table bothniabladet.image(
   image_id                    serial,
   technical_metadata_id       bigint        unsigned,
-  title                       varchar(50)   unique     not null,
+  title                       varchar(50)   not null,
   description                 varchar(300),
-  image_url                   varChar(500)  unique,                
+  image_url                   varChar(500),                
   price                       double        unsigned   not null,
   journalist                  varchar(100),
   uses                        bigint        unsigned   not null,
@@ -95,6 +95,24 @@ create table bothniabladet.image(
 );
 
 alter table bothniabladet.image alter image_url set default null;
+
+create table bothniabladet.version(
+  version_id                  serial,
+  version_no                  bigint        unsigned     not null,
+  image_id                    bigint        unsigned     not null,
+  original_id                 bigint        unsigned     not null,
+  created_at                  datetime,
+
+  constraint pk_version primary key(version_id),
+
+  constraint fk_image_version
+  foreign key(image_id) references bothniabladet.image(image_id)
+  on delete cascade,
+
+  constraint fk_original_id
+  foreign key(original_id) references bothniabladet.image(image_id)
+  on delete cascade
+);
 
 create table bothniabladet.image_tag(
   image_id          bigint     unsigned   not null,
@@ -206,7 +224,8 @@ insert into bothniabladet.image
 (title,              price,     uses,   description,                distributable) values 
 ("mount everest",    13,        6,      "highest mountain",         true),
 ("haaaa",            33.33,     0,      "ha ha he he",              false),
-("kubi",    	       2,	        3,      "cubism at it's finest",    true);
+("kubi",    	       2,	        3,      "cubism at it's finest",    true),
+("mount everest",    23,        6,      "super high mountain",         true);
 
 insert into bothniabladet.shopping_cart_image
 (shopping_cart_id,  image_id,    time_added) values 
@@ -219,6 +238,13 @@ insert into bothniabladet.image_tag
 (2,        2),
 (3,        3),
 (3,        2);
+
+insert into bothniabladet.version
+(version_no,   image_id,    original_id,   created_at) values 
+(1,            1,           1,             date_sub(now(),interval 1 month)),
+(2,            4,           1,             now()),
+(1,            2,           2,             now()),
+(1,            3,           3,             now());
 
 delimiter $$
 /*

@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client';
-import { GET_IMAGES } from '../queries/imageQueries';
 import ImageCard from './ImageCard';
 import Spinner from './Spinner';
 

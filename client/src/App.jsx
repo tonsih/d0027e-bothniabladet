@@ -19,6 +19,7 @@ import { getMe } from './features/auth/authSlice';
 import ShoppingCart from './pages/ShoppingCart';
 import CategoryPage from './pages/CategoryPage';
 import { createUploadLink } from 'apollo-upload-client';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 export const client = new ApolloClient({
 	link: createUploadLink({
@@ -43,7 +44,8 @@ const App = () => {
 								<Route path='/register' element={<Register />} />
 								<Route path='/admin/users' element={<AdminUsers />} />
 								<Route path='/admin/images' element={<AdminImages />} />
-								<Route path='/image/:image' element={<ImagePage />}></Route>
+								<Route path='/image/:image' element={<ImagePage />} />
+								<Route path='/order/:order' element={<OrderConfirmation />} />
 								<Route
 									path='/category/:category'
 									element={<CategoryPage />}

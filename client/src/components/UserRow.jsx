@@ -113,7 +113,6 @@ const UserRow = ({ user: curUser }) => {
 						disabled={user_id === meData?.me?.user_id}
 					>
 						<FaBan />
-						{console.log(user_id === meData?.me?.user_id)}
 					</Button>
 				)}
 			</td>

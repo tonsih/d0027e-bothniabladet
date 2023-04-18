@@ -22,8 +22,7 @@ class image extends Sequelize.Model {
     },
     title: {
       type: DataTypes.STRING(50),
-      allowNull: false,
-      unique: "title"
+      allowNull: false
     },
     description: {
       type: DataTypes.STRING(300),
@@ -31,8 +30,7 @@ class image extends Sequelize.Model {
     },
     image_url: {
       type: DataTypes.STRING(500),
-      allowNull: true,
-      unique: "image_url"
+      allowNull: true
     },
     price: {
       type: DataTypes.DOUBLE,
@@ -69,22 +67,6 @@ class image extends Sequelize.Model {
         using: "BTREE",
         fields: [
           { name: "image_id" },
-        ]
-      },
-      {
-        name: "title",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "title" },
-        ]
-      },
-      {
-        name: "image_url",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "image_url" },
         ]
       },
       {

@@ -4,6 +4,7 @@ import {
 	FaSignOutAlt,
 	FaUser,
 	FaShoppingCart,
+	FaCamera,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import MenuButton from './MenuButton';
@@ -112,7 +113,7 @@ const Header = () => {
 				<div className='container'>
 					<Link to='/' className='navbar-brand'>
 						<div className='d-flex align-items-center'>
-							<FaStore className='pr-3' />
+							<FaCamera className='pr-3' />
 							<div className='logo-text'>BothniaBladet</div>
 						</div>
 					</Link>

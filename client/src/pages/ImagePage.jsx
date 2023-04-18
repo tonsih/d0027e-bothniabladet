@@ -24,13 +24,17 @@ const ImagePage = () => {
 	const [getSci, { data: sciData }] = useLazyQuery(USER_SHOPPING_CART_IMAGE);
 
 	useEffect(() => {
-		if (image_id && user?.shopping_cart?.shopping_cart_id) {
-			getSci({
+		const getSciFunc = async () => {
+			await getSci({
 				variables: {
-					image_id,
+					image_ids: image_id,
 					shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
 				},
 			});
+		};
+
+		if (image_id && user?.shopping_cart?.shopping_cart_id) {
+			getSciFunc();
 		}
 	}, [image_id, getSci, user]);
 
@@ -72,7 +76,7 @@ const ImagePage = () => {
 				{
 					query: USER_SHOPPING_CART_IMAGE,
 					variables: {
-						image_id: imageId,
+						image_ids: imageId,
 						shopping_cart_id: shoppingCartId,
 					},
 				},
@@ -81,8 +85,8 @@ const ImagePage = () => {
 	};
 
 	const ButtonTextHolder = () => {
-		if (user && sciData?.shopping_cart_image_by_image_id) {
-			if (sciData?.shopping_cart_image_by_image_id?.length <= 0) {
+		if (user && sciData?.shopping_cart_image_by_image_ids) {
+			if (sciData?.shopping_cart_image_by_image_ids?.length <= 0) {
 				return (
 					<>
 						<FaShoppingCart className='mr-4' /> Add to Cart
@@ -130,7 +134,7 @@ const ImagePage = () => {
 										className='w-100 p-3'
 										disabled={
 											user &&
-											sciData?.shopping_cart_image_by_image_id?.length > 0
+											sciData?.shopping_cart_image_by_image_ids?.length > 0
 										}
 										{...(!user?.shopping_cart
 											? { onClick: onClickHandler }

@@ -29,13 +29,13 @@ const USER_SHOPPING_CART_IMAGES = gql`
 `;
 
 const USER_SHOPPING_CART_IMAGE = gql`
-	query shopping_cart_image_by_image_id(
-		$image_id: ID!
+	query shopping_cart_image_by_image_ids(
 		$shopping_cart_id: ID!
+		$image_ids: [ID]!
 	) {
-		shopping_cart_image_by_image_id(
-			image_id: $image_id
+		shopping_cart_image_by_image_ids(
 			shopping_cart_id: $shopping_cart_id
+			image_ids: $image_ids
 		) {
 			shopping_cart_image_id
 			shopping_cart {

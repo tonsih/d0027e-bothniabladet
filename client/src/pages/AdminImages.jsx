@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/client';
 import AddImageModal from '../components/AddImageModal';
-import ImageRow from '../components/ImageRow';
+import AdminImageRow from '../components/AdminImageRow';
 import Spinner from '../components/Spinner';
-import { GET_IMAGES } from '../queries/imageQueries';
+import { GET_LATEST_VERSION_IMAGES } from '../queries/imageQueries';
 import '../scss/AdminImages.scss';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminImages = () => {
 	const navigate = useNavigate();
-	const { data, loading } = useQuery(GET_IMAGES);
+	const { data, loading } = useQuery(GET_LATEST_VERSION_IMAGES);
 	const { user } = useSelector(state => state.auth);
 
 	useEffect(() => {
@@ -42,9 +42,9 @@ const AdminImages = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data?.images &&
-							data.images.map(image => (
-								<ImageRow image={image} key={image.image_id} />
+						{data?.latest_version_images &&
+							data?.latest_version_images.map(image => (
+								<AdminImageRow image={image.image} key={image.image.image_id} />
 							))}
 					</tbody>
 				</table>

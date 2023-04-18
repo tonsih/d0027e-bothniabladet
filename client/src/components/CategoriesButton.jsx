@@ -25,35 +25,39 @@ export default function CategoriesButton() {
 	}
 
 	return (
-		<>
-			<PopupState variant='popover' popupId='demo-popup-menu'>
-				{popupState => (
-					<React.Fragment>
-						<ThemeProvider theme={theme}>
-							<MenuButton
-								variant='text'
-								{...bindTrigger(popupState)}
-								disableElevation
-								startIcon={<FaList />}
-							>
-								Categories
-							</MenuButton>
-							<Menu {...bindMenu(popupState)}>
-								{categoriesSet &&
-									categoriesSet.size > 0 &&
-									[...categoriesSet].map(category => (
-										<Link
-											key={category}
-											to={`/category/${category.toLowerCase()}`}
-										>
-											<MenuItem onClick={popupState.close}>{category}</MenuItem>
-										</Link>
-									))}
-							</Menu>
-						</ThemeProvider>
-					</React.Fragment>
-				)}
-			</PopupState>
-		</>
+		categoriesSet.size > 0 && (
+			<>
+				<PopupState variant='popover' popupId='demo-popup-menu'>
+					{popupState => (
+						<React.Fragment>
+							<ThemeProvider theme={theme}>
+								<MenuButton
+									variant='text'
+									{...bindTrigger(popupState)}
+									disableElevation
+									startIcon={<FaList />}
+								>
+									Categories
+								</MenuButton>
+								<Menu {...bindMenu(popupState)}>
+									{categoriesSet &&
+										categoriesSet.size > 0 &&
+										[...categoriesSet].map(category => (
+											<Link
+												key={category}
+												to={`/category/${category.toLowerCase()}`}
+											>
+												<MenuItem onClick={popupState.close}>
+													{category}
+												</MenuItem>
+											</Link>
+										))}
+								</Menu>
+							</ThemeProvider>
+						</React.Fragment>
+					)}
+				</PopupState>
+			</>
+		)
 	);
 }

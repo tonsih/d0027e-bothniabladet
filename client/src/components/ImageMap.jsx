@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import icon from 'leaflet/dist/images/marker-icon.png';
 import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import 'leaflet/dist/leaflet.css';
+import 'react-leaflet-markercluster/dist/styles.min.css';
+import '../scss/ImageMap.scss';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { FaCamera } from 'react-icons/fa';
+import { renderToStaticMarkup } from 'react-dom/server';
 
-function ImageMap({ coordinates }) {
+function ImageMap({ coordinates, image }) {
 	const [coordString, setCoordString] = useState(coordinates);
 
-	let DefaultIcon = L.icon({
+	let defaultIcon = L.icon({
 		iconUrl: icon,
 		shadowUrl: iconShadow,
 	});
-	L.Marker.prototype.options.icon = DefaultIcon;
+
+	L.Marker.prototype.options.icon = defaultIcon;
 
 	const convertCoordinates = coordString => {
 		const [latStr, lonStr] = coordString.split(/[, ]+/);
@@ -22,7 +27,6 @@ function ImageMap({ coordinates }) {
 		const longitude = lonStr.includes('W') ? -lon : lon;
 		return { latitude, longitude };
 	};
-	console.log(coordinates);
 
 	// Handle changes to the input field
 	const handleInputChange = event => {
@@ -38,26 +42,30 @@ function ImageMap({ coordinates }) {
 
 	// Render the map
 	return (
-		<div>
-			<input type='text' value={coordString} readOnly />
+		// <div>
+		// 	<input type='text' value={coordString} readOnly />
 
-			<MapContainer
-				center={[coords.latitude, coords.longitude]}
-				zoom={13}
-				style={{ height: '400px' }}
-			>
-				<TileLayer
-					url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-					attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-				/>
-				<Marker position={[coords.latitude, coords.longitude]}>
-					<Popup>
-						Coordinates: {coords.latitude.toFixed(6)},{' '}
-						{coords.longitude.toFixed(6)}
-					</Popup>
-				</Marker>
-			</MapContainer>
-		</div>
+		<MapContainer
+			center={[coords.latitude, coords.longitude]}
+			zoom={3}
+			style={{ height: '400px' }}
+		>
+			<TileLayer
+				url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+				attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+			/>
+			<Marker position={[coords.latitude, coords.longitude]} icon={defaultIcon}>
+				<Popup>
+					Coordinates: {coords.latitude.toFixed(6)},{' '}
+					{coords.longitude.toFixed(6)}
+					<img
+						className='w-100'
+						alt={image?.image_id}
+						src={image?.image_url || 'https://placehold.co/500x400'}
+					/>
+				</Popup>
+			</Marker>
+		</MapContainer>
 	);
 }
 

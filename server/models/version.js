@@ -1,38 +1,44 @@
 const Sequelize = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  return order.init(sequelize, DataTypes);
+  return version.init(sequelize, DataTypes);
 }
 
-class order extends Sequelize.Model {
+class version extends Sequelize.Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    order_id: {
+    version_id: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true
     },
-    user_id: {
+    version_no: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false
+    },
+    image_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'user',
-        key: 'user_id'
+        model: 'image',
+        key: 'image_id'
       }
     },
-    total_price: {
-      type: DataTypes.DOUBLE,
+    original_id: {
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      defaultValue: 0
+      references: {
+        model: 'image',
+        key: 'image_id'
+      }
     },
-    order_date: {
+    created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'order',
+    tableName: 'version',
     timestamps: false,
     indexes: [
       {
@@ -40,22 +46,29 @@ class order extends Sequelize.Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "order_id" },
+          { name: "version_id" },
         ]
       },
       {
-        name: "order_id",
+        name: "version_id",
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "order_id" },
+          { name: "version_id" },
         ]
       },
       {
-        name: "fk_user_order",
+        name: "fk_image_version",
         using: "BTREE",
         fields: [
-          { name: "user_id" },
+          { name: "image_id" },
+        ]
+      },
+      {
+        name: "fk_original_id",
+        using: "BTREE",
+        fields: [
+          { name: "original_id" },
         ]
       },
     ]

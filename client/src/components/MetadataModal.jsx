@@ -7,7 +7,7 @@ import { useQuery } from '@apollo/client';
 import { GET_TECHNICAL_METADATA } from '../queries/imageQueries';
 import ImageMap from './ImageMap';
 
-const MetadataModal = ({ metadata }) => {
+const MetadataModal = ({ metadata, image }) => {
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => {
@@ -45,32 +45,39 @@ const MetadataModal = ({ metadata }) => {
 				<Modal.Body className='d-flex justify-content-center flex-column'>
 					{metadata &&
 						Object.keys(metadata).map(key => {
-							if (key !== '__typename') {
-								let value = metadata[key];
-								if (Date.parse(value)) {
-									value = new Date(value).toLocaleString('sv-SE', {
-										timeZone: 'Europe/Stockholm',
-									});
-								}
+							let value = metadata[key];
 
-								if (key === 'coordinates' || key === 'technical_metadata_id') {
+							switch (key) {
+								case 'coordinates':
+								case 'technical_metadata_id':
+								case '__typename':
 									return null;
-								} else if (key === 'size') {
+								case 'size':
 									value = formatFileSize(value);
-								}
-
-								return (
-									<div className='metadata_attribute d-flex' key={key}>
-										<p>
-											<strong>{key}:&nbsp;</strong>
-										</p>
-										<p>{value}</p>
-									</div>
-								);
+									break;
+								case 'width':
+								case 'height':
+									value = `${value} pixels`;
+									break;
 							}
+
+							if (value === 'last_modified' && Date.parse(value)) {
+								value = new Date(value).toLocaleString('sv-SE', {
+									timeZone: 'Europe/Stockholm',
+								});
+							}
+
+							return (
+								<div className='metadata_attribute d-flex' key={key}>
+									<p>
+										<strong>{key}:&nbsp;</strong>
+									</p>
+									<p>{value}</p>
+								</div>
+							);
 						})}
 					{metadata && metadata.coordinates && (
-						<ImageMap coordinates={metadata.coordinates} />
+						<ImageMap coordinates={metadata.coordinates} image={image} />
 					)}
 
 					<Modal.Footer>
