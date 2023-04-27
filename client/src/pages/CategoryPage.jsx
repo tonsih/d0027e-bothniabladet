@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/client';
-import { GET_IMAGES_BY_TAG_NAME } from '../queries/imageQueries';
-import Spinner from '../components/Spinner';
 import { useParams } from 'react-router-dom';
 import ImageCard from '../components/ImageCard';
+import Spinner from '../components/Spinner';
+import { GET_IMAGES_BY_TAG_NAME } from '../queries/imageQueries';
+import SearchFieldWithImages from '../components/SearchFieldWithImages';
+import { useEffect, useState } from 'react';
 
 const CategoryPage = () => {
 	const { category: tagName } = useParams();
@@ -10,28 +12,30 @@ const CategoryPage = () => {
 		variables: { tag_name: tagName },
 	});
 
+	const [images, setImages] = useState([]);
+
+	useEffect(() => {
+		if (data?.images_by_tag_name) {
+			let imgArr = [];
+			for (const image of data?.images_by_tag_name) {
+				const { image: img } = image;
+				const { uses, distributable, deleted } = img;
+				if (uses > 0 && distributable && !deleted) {
+					{
+						imgArr.push(img);
+					}
+				}
+			}
+			setImages(imgArr);
+		}
+	}, [data]);
+
 	if (loading) return <Spinner />;
 	if (error) return <p>Something went wrong</p>;
 
 	return (
 		<>
-			<div className='row'>
-				{!loading &&
-					!error &&
-					data?.images_by_tag_name &&
-					data?.images_by_tag_name.map(
-						image =>
-							image.uses > 0 &&
-							image.distributable && (
-								<div
-									className='col-sm-12 col-md-6 col-lg-4 col-xl-4 pb-3'
-									key={image.image_id}
-								>
-									<ImageCard key={image.image_id} image={image} />
-								</div>
-							)
-					)}
-			</div>
+			<SearchFieldWithImages images={images} />
 		</>
 	);
 };

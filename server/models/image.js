@@ -47,6 +47,11 @@ class image extends Sequelize.Model {
     distributable: {
       type: DataTypes.BOOLEAN,
       allowNull: true
+    },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: 0
     }
   }, {
     sequelize,

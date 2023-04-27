@@ -1,17 +1,13 @@
 import { useMutation } from '@apollo/client';
-import { useEffect } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
+import { FaTrash } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 import { DELETE_SHOPPING_CART_IMAGE } from '../mutations/shoppingCartMutations';
-import { getMe, reset } from '../features/auth/authSlice';
 import {
-	SHOPPING_CART_IMAGES,
 	USER_SHOPPING_CART,
 	USER_SHOPPING_CART_IMAGE,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import ActionButton from './ActionButton';
-import { ME_QUERY } from '../queries/userQueries';
 
 const ShoppingCartImageRow = ({ image, userId }) => {
 	const { image_id, image_url, title, price, uses, description } = image?.image;

@@ -86,6 +86,7 @@ create table bothniabladet.image(
   journalist                  varchar(100),
   uses                        bigint        unsigned   not null,
   distributable               boolean,
+  deleted                     boolean,
 
   constraint pk_image primary key(image_id),
 
@@ -95,6 +96,7 @@ create table bothniabladet.image(
 );
 
 alter table bothniabladet.image alter image_url set default null;
+alter table bothniabladet.image alter deleted set default false;
 
 create table bothniabladet.version(
   version_id                  serial,

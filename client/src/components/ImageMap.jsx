@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css';
+import React, { useState } from 'react';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import 'react-leaflet-markercluster/dist/styles.min.css';
 import '../scss/ImageMap.scss';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { FaCamera } from 'react-icons/fa';
-import { renderToStaticMarkup } from 'react-dom/server';
 
 function ImageMap({ coordinates, image }) {
 	const [coordString, setCoordString] = useState(coordinates);

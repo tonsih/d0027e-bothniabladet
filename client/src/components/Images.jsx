@@ -1,6 +1,4 @@
-import { useQuery } from '@apollo/client';
 import ImageCard from './ImageCard';
-import Spinner from './Spinner';
 
 const Images = ({ images }) => {
 	return (

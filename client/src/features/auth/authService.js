@@ -1,11 +1,11 @@
+import { client } from '../../App';
 import {
 	LOGIN_USER,
 	LOGOUT_USER,
 	REGISTER_USER,
 } from '../../mutations/userMutations';
-import { client } from '../../App';
-import { ME_QUERY, USERS_QUERY } from '../../queries/userQueries';
 import { USER_SHOPPING_CART } from '../../queries/shoppingCartQueries';
+import { ME_QUERY, USERS_QUERY } from '../../queries/userQueries';
 
 const register = async ({ first_name, last_name, email, password }) => {
 	const { data } = await client.mutate({

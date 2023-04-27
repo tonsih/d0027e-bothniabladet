@@ -1,20 +1,15 @@
+import { useMutation, useQuery } from '@apollo/client';
+import { Button } from '@mui/material';
 import {
-	FaArrowUp,
 	FaBan,
 	FaCheckCircle,
-	FaLevelUpAlt,
-	FaLongArrowAltUp,
 	FaMedal,
 	FaRegThumbsDown,
-	FaThumbsDown,
 	FaThumbsUp,
 	FaTrash,
-	FaTrophy,
 } from 'react-icons/fa';
 import { DELETE_USER, UPDATE_USER } from '../mutations/userMutations';
-import { useMutation, useQuery } from '@apollo/client';
 import { ME_QUERY, USERS_QUERY } from '../queries/userQueries';
-import { Button } from '@mui/material';
 
 const UserRow = ({ user: curUser }) => {
 	const { user_id, first_name, last_name, email, admin, banned } = curUser;

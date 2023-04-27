@@ -30,4 +30,14 @@ const GET_ORDER_IMAGES = gql`
 	}
 `;
 
-export { GET_ORDER, GET_ORDER_IMAGES };
+const GET_USER_ORDERS = gql`
+	query user_orders {
+		user_orders {
+			order_id
+			order_date
+			total_price
+		}
+	}
+`;
+
+export { GET_ORDER, GET_ORDER_IMAGES, GET_USER_ORDERS };

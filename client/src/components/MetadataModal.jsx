@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { FaInfoCircle, FaPlus } from 'react-icons/fa';
+import { FaInfoCircle } from 'react-icons/fa';
 import ActionButton from './ActionButton';
-import { useQuery } from '@apollo/client';
-import { GET_TECHNICAL_METADATA } from '../queries/imageQueries';
 import ImageMap from './ImageMap';
 
 const MetadataModal = ({ metadata, image }) => {

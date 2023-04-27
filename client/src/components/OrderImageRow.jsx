@@ -1,6 +1,5 @@
 const OrderImageRow = ({ image }) => {
 	const { image_id, image_url, title, price, description } = image?.image;
-	console.log(image);
 
 	return (
 		<>

@@ -1,37 +1,35 @@
-import { Field, Form, Formik, useField } from 'formik';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { Checkbox, Chip, TextField, ThemeProvider } from '@mui/material';
+import exifr from 'exifr';
+import { Form, Formik, useField } from 'formik';
+import _, { isEmpty } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import { Badge } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Dropzone from 'react-dropzone';
 import { FaEdit, FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
-import ActionButton from './ActionButton';
 import * as yup from 'yup';
 import {
-	Checkbox,
-	TextareaAutosize,
-	TextField,
-	ThemeProvider,
-} from '@mui/material';
-import { theme } from '../style/themes';
-import {
-	ADD_IMAGE,
-	ADD_TECHNICAL_METADATA,
 	CREATE_IMAGE_TAG,
 	DELETE_IMAGE_TAG,
 	UPDATE_IMAGE,
 } from '../mutations/imageMutations';
-import { gql, useMutation, useQuery } from '@apollo/client';
 import {
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
 } from '../queries/imageQueries';
-import Dropzone from 'react-dropzone';
-import exifr from 'exifr';
 import '../scss/AddImageModal.scss';
-import { DateTime } from 'luxon';
-import { Badge } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
+import { theme } from '../style/themes';
+import ActionButton from './ActionButton';
+import {
+	SHOPPING_CART_IMAGES,
+	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGES,
+} from '../queries/shoppingCartQueries';
+import { useSelector } from 'react-redux';
 
 const MyTextField = ({
 	placeholder,
@@ -99,21 +97,29 @@ const MyTagTextField = ({
 
 const EditImageModal = ({ imageToEdit }) => {
 	const {
-		image_id,
-		title,
-		price,
-		uses,
-		image_url,
-		description,
+		image_id: imgId,
+		title: imgTitle,
+		price: imgPrice,
+		uses: imgUses,
+		image_url: imgUrl,
+		description: imgDescription,
 		distributable: imgDistributable,
-		journalist,
+		journalist: imgJournalist,
 	} = imageToEdit;
 
 	const { data: itsData } = useQuery(GET_IMAGE_TAGS_BY_IMAGE_ID, {
 		variables: {
-			image_id,
+			image_id: imgId,
 		},
 	});
+
+	const { user, isLoading, isError, isSuccess, message } = useSelector(
+		state => state.auth
+	);
+
+	const [getITBIData, { refetch: refetchITBI }] = useLazyQuery(
+		GET_IMAGE_TAGS_BY_IMAGE_ID
+	);
 
 	const [updateImage, { data: imgData }] = useMutation(UPDATE_IMAGE);
 
@@ -121,6 +127,7 @@ const EditImageModal = ({ imageToEdit }) => {
 	const [deleteImageTag] = useMutation(DELETE_IMAGE_TAG);
 	const [show, setShow] = useState(false);
 	const [distributable, setDistributable] = useState(imgDistributable);
+	const [oldTags, setOldTags] = useState(new Set());
 	const [tags, setTags] = useState(new Set());
 	const [tagInputValue, setTagInputValue] = useState('');
 
@@ -133,6 +140,7 @@ const EditImageModal = ({ imageToEdit }) => {
 			}
 		}
 		setTags(new Set(tagsSet));
+		setOldTags(new Set(tagsSet));
 	}, [itsData, show]);
 
 	const handleAddTag = tag => {
@@ -196,94 +204,106 @@ const EditImageModal = ({ imageToEdit }) => {
 						<Formik
 							validationSchema={schema}
 							initialValues={{
-								title: title || '',
-								price: price || '',
-								description: description || '',
-								uses: uses || uses >= 0 ? uses : '',
-								journalist: journalist || '',
+								title: imgTitle || '',
+								price: imgPrice || '',
+								description: imgDescription || '',
+								uses: imgUses || imgUses >= 0 ? imgUses : '',
+								journalist: imgJournalist || '',
 							}}
 							onSubmit={async (data, { setSubmitting }) => {
 								setSubmitting(true);
-								const { title, price, description, uses, journalist } = data;
-
-								let GPSLatitude, GPSLongitude, Model;
-
-								if (image) {
-									({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
-										image,
-										true
-									));
-								}
-
 								try {
-									const imageModifiedDate = image?.lastModified
-										? DateTime.fromMillis(image.lastModified)
-												.setZone('Europe/Stockholm')
-												.toJSDate()
-												.toLocaleString('en-US', {
-													timeZone: 'Europe/Stockholm',
-												})
-										: null;
+									const { title, price, description, uses, journalist } = data;
 
-									const isoModifiedDate = imageModifiedDate
-										? new Date(imageModifiedDate)
-										: null;
-									if (isoModifiedDate) {
-										isoModifiedDate.setHours(isoModifiedDate.getHours() + 2);
-									}
-									const isoModifiedDateString = isoModifiedDate
-										? isoModifiedDate.toISOString()
-										: null;
+									if (
+										title !== imgTitle ||
+										price !== imgPrice ||
+										description !== imgDescription ||
+										(uses !== imgUses && !_.isEmpty(title)) ||
+										(journalist !== imgJournalist && !_.isEmpty(title)) ||
+										image ||
+										distributable !== imgDistributable ||
+										!_.isEqual(oldTags, tags)
+									) {
+										let GPSLatitude, GPSLongitude, Model;
 
-									const newImage = await updateImage({
-										variables: {
-											image_id: parseInt(image_id),
-											title,
-											price: price ? parseFloat(price) : null,
-											description,
-											uses: uses && distributable ? parseInt(uses) : 0,
-											journalist,
-											distributable,
-											coordinates:
-												GPSLatitude && GPSLongitude
-													? `${GPSLatitude}, ${GPSLongitude}`
-													: null,
-											camera_type: Model,
-											image_file: image || null,
-											format: image?.type || null,
-											last_modified: image?.lastModified
-												? isoModifiedDateString
-												: null,
-											size: image?.size || null,
-										},
-										refetchQueries: [
-											{
-												query: GET_LATEST_VERSION_IMAGES,
-											},
-										],
-									});
+										if (image) {
+											({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
+												image,
+												true
+											));
+										}
 
-									const { image_id: new_image_id } =
-										newImage?.data?.updateImage;
-
-									for (const tagName of Array.from(tags)) {
-										await createImageTag({
+										const newImage = await updateImage({
 											variables: {
-												image_id: new_image_id,
-												name: tagName,
+												image_id: parseInt(imgId),
+												title,
+												price: price ? parseFloat(price) : null,
+												description,
+												uses: uses && distributable ? parseInt(uses) : 0,
+												journalist,
+												distributable,
+												image_url: image ? null : imgUrl || null,
+												coordinates:
+													GPSLatitude && GPSLongitude
+														? `${GPSLatitude}, ${GPSLongitude}`
+														: null,
+												camera_type: Model,
+												image_file: image || null,
+												format: image?.type || null,
+												last_modified: image?.lastModified
+													? getNowDateISOString()
+													: null,
+												size: image?.size || null,
 											},
 											refetchQueries: [
 												{
-													query: GET_IMAGE_TAGS,
+													query: GET_LATEST_VERSION_IMAGES,
 												},
 												{
-													query: GET_IMAGES_BY_TAG_NAME,
+													query: USER_SHOPPING_CART_IMAGES,
 													variables: {
-														tag_name: tagName,
+														shopping_cart_id:
+															user?.shopping_cart?.shopping_cart_id,
+													},
+												},
+												{
+													query: USER_SHOPPING_CART,
+													variables: {
+														user_id: user?.me?.user_id,
 													},
 												},
 											],
 										});
+
+										const { image_id: new_image_id } =
+											newImage?.data?.updateImage;
+
+										for (const tagName of Array.from(tags)) {
+											await createImageTag({
+												variables: {
+													image_id: new_image_id,
+													name: tagName,
+												},
+												refetchQueries: [
+													{
+														query: GET_IMAGE_TAGS,
+													},
+													{
+														query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+														variables: {
+															image_id: new_image_id,
+														},
+													},
+													{
+														query: GET_IMAGES_BY_TAG_NAME,
+														variables: {
+															tag_name: tagName,
+														},
+													},
+												],
+											});
+										}
 									}
 								} catch (error) {
 									console.log(error);
@@ -344,7 +364,7 @@ const EditImageModal = ({ imageToEdit }) => {
 												}
 											}}
 										/>
-										<Button
+										<ActionButton
 											onClick={() => {
 												handleAddTag(tagInputValue);
 											}}
@@ -352,24 +372,22 @@ const EditImageModal = ({ imageToEdit }) => {
 											className='ml-auto'
 										>
 											<FaPlus />
-										</Button>
+										</ActionButton>
 										{tags && tags.size > 0 && (
 											<div className='tagContainer'>
 												<ul className='list-unstyled d-flex flex-wrap mt-3'>
 													{Array.from(tags).map((tag, index) => (
 														<li key={index}>
-															<Badge className='badge-info mr-2 mb-2'>
-																{tag}{' '}
-																<Button
-																	variant='light'
-																	size='sm'
-																	onClick={() =>
-																		handleRemoveTag(index, tags, setTags)
-																	}
-																>
-																	<FaTimes />
-																</Button>
-															</Badge>
+															<Chip
+																label={tag}
+																color='primary'
+																onClick={() =>
+																	handleRemoveTag(index, tags, setTags)
+																}
+																onDelete={() =>
+																	handleRemoveTag(index, tags, setTags)
+																}
+															/>
 														</li>
 													))}
 												</ul>
@@ -433,7 +451,7 @@ const EditImageModal = ({ imageToEdit }) => {
 										<>
 											<div className='imageUpload'>
 												{image?.name}
-												<Button
+												<ActionButton
 													variant='secondary'
 													onClick={() => {
 														setImage(null);
@@ -441,7 +459,7 @@ const EditImageModal = ({ imageToEdit }) => {
 													}}
 												>
 													<FaTrash />
-												</Button>
+												</ActionButton>
 												<div className='image-preview p-2'>
 													<span>Image preview</span>
 													<img
@@ -454,12 +472,12 @@ const EditImageModal = ({ imageToEdit }) => {
 										</>
 									)}
 
-									{image_url && (
+									{imgUrl && (
 										<div className='current-img'>
 											<div className='image-preview p-2'>
 												<span>Current Image</span>
 												<img
-													src={image_url}
+													src={imgUrl}
 													className='current-img-thumbnail img-thumbnail'
 													alt='Current image thumbnail'
 												/>
@@ -467,17 +485,20 @@ const EditImageModal = ({ imageToEdit }) => {
 										</div>
 									)}
 									<Modal.Footer>
-										<Button
+										<ActionButton
 											color='primary'
 											disabled={isSubmitting}
 											type='submit'
 											className='form-button'
 										>
 											Save Changes
-										</Button>
-										<Button variant='secondary' onClick={handleClose}>
+										</ActionButton>
+										<ActionButton
+											className='close-modal-button'
+											onClick={handleClose}
+										>
 											Close
-										</Button>
+										</ActionButton>
 									</Modal.Footer>
 								</Form>
 							)}
@@ -488,4 +509,5 @@ const EditImageModal = ({ imageToEdit }) => {
 		</>
 	);
 };
-export default EditImageModal;
+
+export default React.memo(EditImageModal);

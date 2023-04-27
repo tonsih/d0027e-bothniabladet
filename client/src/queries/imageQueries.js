@@ -11,6 +11,7 @@ const GET_IMAGES = gql`
 			description
 			journalist
 			distributable
+			deleted
 		}
 	}
 `;
@@ -32,6 +33,7 @@ const GET_LATEST_VERSION_IMAGES = gql`
 				description
 				journalist
 				distributable
+				deleted
 			}
 		}
 	}
@@ -48,6 +50,7 @@ const GET_IMAGE_TAGS = gql`
 				image_id
 				uses
 				distributable
+				deleted
 			}
 		}
 	}
@@ -67,14 +70,36 @@ const GET_IMAGE_TAGS_BY_IMAGE_ID = gql`
 const GET_IMAGES_BY_TAG_NAME = gql`
 	query images_by_tag_name($tag_name: String!) {
 		images_by_tag_name(tag_name: $tag_name) {
-			image_id
-			image_url
-			title
-			price
-			uses
-			description
-			distributable
-			journalist
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+				deleted
+			}
+		}
+	}
+`;
+
+const GET_ALL_IMAGE_VERSIONS = gql`
+	query all_versions_image($image_id: ID!) {
+		all_versions_image(image_id: $image_id) {
+			version_no
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+				deleted
+			}
 		}
 	}
 `;
@@ -90,6 +115,7 @@ const GET_IMAGE = gql`
 			description
 			journalist
 			distributable
+			deleted
 		}
 	}
 `;
@@ -117,4 +143,5 @@ export {
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_IMAGE,
 	GET_TECHNICAL_METADATA,
+	GET_ALL_IMAGE_VERSIONS,
 };

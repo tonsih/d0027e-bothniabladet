@@ -1,13 +1,13 @@
-import { Formik, Form, useField } from 'formik';
+import { Button, TextField, ThemeProvider } from '@mui/material';
+import { Form, Formik, useField } from 'formik';
+import { useEffect } from 'react';
 import { FaSignInAlt } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import YupPassword from 'yup-password';
-import { Button, TextField, ThemeProvider } from '@mui/material';
-import { theme } from '../style/themes';
-import { useDispatch, useSelector } from 'react-redux';
 import { login, reset } from '../features/auth/authSlice';
-import { useEffect } from 'react';
+import { theme } from '../style/themes';
 YupPassword(yup); // extend yup
 
 const schema = yup.object({

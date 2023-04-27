@@ -1,21 +1,21 @@
+import { useLazyQuery } from '@apollo/client';
+import { memo, useEffect } from 'react';
 import {
-	FaStore,
+	FaCamera,
+	FaShoppingCart,
 	FaSignInAlt,
 	FaSignOutAlt,
 	FaUser,
-	FaShoppingCart,
-	FaCamera,
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import MenuButton from './MenuButton';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { getMe, logout, reset } from '../features/auth/authSlice';
-import { memo, useEffect } from 'react';
-import '../scss/Header.scss';
 import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import '../scss/Header.scss';
 import AdminButton from './AdminButton';
 import CategoriesButton from './CategoriesButton';
+import MenuButton from './MenuButton';
+import UserMenu from './UserMenu';
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -89,20 +89,7 @@ const Header = () => {
 				</Link>
 			)}
 			<li className='nav-item'>
-				<MenuButton sx={{ textTransform: 'lowercase' }}>
-					{user?.me?.email}
-				</MenuButton>
-			</li>
-			<li className='nav-item'>
-				<MenuButton
-					onClick={async () => {
-						dispatch(logout());
-						dispatch(reset());
-					}}
-					startIcon={<FaSignOutAlt />}
-				>
-					Logout
-				</MenuButton>
+				<UserMenu email={user?.me?.email} />
 			</li>
 		</>
 	);

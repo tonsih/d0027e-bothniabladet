@@ -1,34 +1,30 @@
-import { Field, Form, Formik, useField } from 'formik';
-import React, { useMemo, useRef, useState } from 'react';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { Checkbox, Chip, TextField, ThemeProvider } from '@mui/material';
+import exifr from 'exifr';
+import { Form, Formik, useField } from 'formik';
+import { isEmpty } from 'lodash';
+import { DateTime } from 'luxon';
+import React, { useMemo, useState } from 'react';
+import { Badge } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Dropzone from 'react-dropzone';
 import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
-import ActionButton from './ActionButton';
 import * as yup from 'yup';
-import {
-	Checkbox,
-	TextareaAutosize,
-	TextField,
-	ThemeProvider,
-} from '@mui/material';
-import { theme } from '../style/themes';
 import {
 	ADD_IMAGE,
 	ADD_TECHNICAL_METADATA,
 	CREATE_IMAGE_TAG,
 } from '../mutations/imageMutations';
-import { gql, useMutation } from '@apollo/client';
 import {
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
+	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
 } from '../queries/imageQueries';
-import Dropzone from 'react-dropzone';
-import exifr from 'exifr';
 import '../scss/AddImageModal.scss';
-import { DateTime } from 'luxon';
-import { Badge } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
+import { theme } from '../style/themes';
+import ActionButton from './ActionButton';
 
 const MyTextField = ({
 	placeholder,
@@ -106,6 +102,10 @@ const AddImageModal = () => {
 	const [addImage, { data: imgData }] = useMutation(ADD_IMAGE);
 	const [addTechnicalMetadata, { data: tmData }] = useMutation(
 		ADD_TECHNICAL_METADATA
+	);
+
+	const [getITBIData, { refetch: refetchITBI }] = useLazyQuery(
+		GET_IMAGE_TAGS_BY_IMAGE_ID
 	);
 
 	const [createImageTag, { data: itData }] = useMutation(CREATE_IMAGE_TAG);
@@ -189,85 +189,93 @@ const AddImageModal = () => {
 								setSubmitting(true);
 								const { title, price, description, uses, journalist } = data;
 
-								let GPSLatitude, GPSLongitude, Model;
+								if (title && price) {
+									let GPSLatitude, GPSLongitude, Model;
 
-								if (image) {
-									({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
-										image,
-										true
-									));
-								}
-
-								try {
-									const imageModifiedDate = image?.lastModified
-										? DateTime.fromMillis(image.lastModified)
-												.setZone('Europe/Stockholm')
-												.toJSDate()
-												.toLocaleString('en-US', {
-													timeZone: 'Europe/Stockholm',
-												})
-										: null;
-
-									const isoModifiedDate = imageModifiedDate
-										? new Date(imageModifiedDate)
-										: null;
-									if (isoModifiedDate) {
-										isoModifiedDate.setHours(isoModifiedDate.getHours() + 2);
+									if (image) {
+										({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
+											image,
+											true
+										));
 									}
-									const isoModifiedDateString = isoModifiedDate
-										? isoModifiedDate.toISOString()
-										: null;
 
-									const addedImage = await addImage({
-										variables: {
-											title,
-											price: price ? parseFloat(price) : null,
-											description,
-											uses: uses && distributable ? parseInt(uses) : 0,
-											journalist,
-											distributable,
-											coordinates:
-												GPSLatitude && GPSLongitude
-													? `${GPSLatitude}, ${GPSLongitude}`
-													: null,
-											camera_type: Model,
-											image_file: image || null,
-											format: image?.type || null,
-											last_modified: image?.lastModified
-												? isoModifiedDateString
-												: null,
-											size: image?.size || null,
-										},
-										refetchQueries: [
-											{
-												query: GET_LATEST_VERSION_IMAGES,
-											},
-										],
-									});
+									try {
+										const imageModifiedDate = image?.lastModified
+											? DateTime.fromMillis(image.lastModified)
+													.setZone('Europe/Stockholm')
+													.toJSDate()
+													.toLocaleString('en-US', {
+														timeZone: 'Europe/Stockholm',
+													})
+											: null;
 
-									const { image_id } = addedImage?.data?.addImage;
+										const isoModifiedDate = imageModifiedDate
+											? new Date(imageModifiedDate)
+											: null;
+										if (isoModifiedDate) {
+											isoModifiedDate.setHours(isoModifiedDate.getHours() + 2);
+										}
+										const isoModifiedDateString = isoModifiedDate
+											? isoModifiedDate.toISOString()
+											: null;
 
-									for (const tagName of Array.from(tags)) {
-										await createImageTag({
+										const addedImage = await addImage({
 											variables: {
-												image_id,
-												name: tagName,
+												title,
+												price: price ? parseFloat(price) : null,
+												description,
+												uses: uses && distributable ? parseInt(uses) : 0,
+												journalist,
+												distributable,
+												coordinates:
+													GPSLatitude && GPSLongitude
+														? `${GPSLatitude}, ${GPSLongitude}`
+														: null,
+												camera_type: Model,
+												image_file: image || null,
+												format: image?.type || null,
+												last_modified: image?.lastModified
+													? isoModifiedDateString
+													: null,
+												size: image?.size || null,
 											},
 											refetchQueries: [
 												{
-													query: GET_IMAGE_TAGS,
-												},
-												{
-													query: GET_IMAGES_BY_TAG_NAME,
-													variables: {
-														tag_name: tagName,
-													},
+													query: GET_LATEST_VERSION_IMAGES,
 												},
 											],
 										});
+
+										const { image_id } = addedImage?.data?.addImage;
+
+										for (const tagName of Array.from(tags)) {
+											await createImageTag({
+												variables: {
+													image_id,
+													name: tagName,
+												},
+												refetchQueries: [
+													{
+														query: GET_IMAGE_TAGS,
+													},
+													{
+														query: GET_IMAGES_BY_TAG_NAME,
+														variables: {
+															tag_name: tagName,
+														},
+													},
+													{
+														query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+														variables: {
+															image_id,
+														},
+													},
+												],
+											});
+										}
+									} catch (error) {
+										console.log(error);
 									}
-								} catch (error) {
-									console.log(error);
 								}
 
 								setSubmitting(false);
@@ -325,32 +333,30 @@ const AddImageModal = () => {
 												}
 											}}
 										/>
-										<Button
+										<ActionButton
 											onClick={() => {
 												handleAddTag(tagInputValue);
 											}}
 											variant='primary'
-											className='ml-auto'
+											className='mt-3'
 										>
 											<FaPlus />
-										</Button>
+										</ActionButton>
 										{tags && tags.size > 0 && (
 											<div className='tagContainer'>
 												<ul className='list-unstyled d-flex flex-wrap mt-3'>
 													{Array.from(tags).map((tag, index) => (
 														<li key={index}>
-															<Badge className='badge-info mr-2 mb-2'>
-																{tag}{' '}
-																<Button
-																	variant='light'
-																	size='sm'
-																	onClick={() =>
-																		handleRemoveTag(index, tags, setTags)
-																	}
-																>
-																	<FaTimes />
-																</Button>
-															</Badge>
+															<Chip
+																label={tag}
+																color='primary'
+																onClick={() =>
+																	handleRemoveTag(index, tags, setTags)
+																}
+																onDelete={() =>
+																	handleRemoveTag(index, tags, setTags)
+																}
+															/>
 														</li>
 													))}
 												</ul>
@@ -413,7 +419,7 @@ const AddImageModal = () => {
 										<>
 											<div className='imageUpload'>
 												{image?.name}
-												<Button
+												<ActionButton
 													variant='secondary'
 													onClick={() => {
 														setImage(null);
@@ -421,7 +427,7 @@ const AddImageModal = () => {
 													}}
 												>
 													<FaTrash />
-												</Button>
+												</ActionButton>
 												<div className='image-preview p-2'>
 													<span>Image preview</span>
 													<img
@@ -434,17 +440,20 @@ const AddImageModal = () => {
 										</>
 									)}
 									<Modal.Footer>
-										<Button
+										<ActionButton
 											color='primary'
 											disabled={isSubmitting}
 											type='submit'
 											className='form-button'
 										>
 											Save Changes
-										</Button>
-										<Button variant='secondary' onClick={handleClose}>
+										</ActionButton>
+										<ActionButton
+											className='close-modal-button'
+											onClick={handleClose}
+										>
 											Close
-										</Button>
+										</ActionButton>
 									</Modal.Footer>
 								</Form>
 							)}

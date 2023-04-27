@@ -16,6 +16,19 @@ const ME_QUERY = gql`
 	}
 `;
 
+const USER_QUERY = gql`
+	query user($user_id: ID!) {
+		user(user_id: $user_id) {
+			user_id
+			first_name
+			last_name
+			email
+			admin
+			banned
+		}
+	}
+`;
+
 const USERS_QUERY = gql`
 	query users {
 		users {
@@ -29,4 +42,4 @@ const USERS_QUERY = gql`
 	}
 `;
 
-export { ME_QUERY, USERS_QUERY };
+export { ME_QUERY, USER_QUERY, USERS_QUERY };

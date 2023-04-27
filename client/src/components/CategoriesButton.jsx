@@ -1,15 +1,14 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
+import { useQuery } from '@apollo/client';
+import { ThemeProvider } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-import { FaCog, FaList } from 'react-icons/fa';
-import { ThemeProvider } from '@mui/material';
-import { theme } from '../style/themes';
+import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import * as React from 'react';
+import { FaList } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import MenuButton from './MenuButton';
-import { useQuery } from '@apollo/client';
 import { GET_IMAGE_TAGS } from '../queries/imageQueries';
+import { theme } from '../style/themes';
+import MenuButton from './MenuButton';
 
 export default function CategoriesButton() {
 	const { data, loading, error } = useQuery(GET_IMAGE_TAGS);
@@ -19,8 +18,8 @@ export default function CategoriesButton() {
 		data.image_tags.forEach(element => {
 			const { image, tag } = element;
 			const { name: tagName } = tag || {};
-			const { uses, distributable } = image || {};
-			if (uses > 0 && distributable) categoriesSet.add(tagName);
+			const { uses, distributable, deleted } = image || {};
+			if (uses > 0 && distributable && !deleted) categoriesSet.add(tagName);
 		});
 	}
 

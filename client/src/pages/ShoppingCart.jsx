@@ -1,19 +1,19 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
+import { Button } from '@mui/material';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import ShoppingCartImageRow from '../components/ShoppingCartImageRow';
-import {
-	USER_SHOPPING_CART,
-	USER_SHOPPING_CART_IMAGE,
-	USER_SHOPPING_CART_IMAGES,
-} from '../queries/shoppingCartQueries';
-import { Button } from '@mui/material';
 import { CREATE_ORDER } from '../mutations/orderMutations';
 import {
 	GET_IMAGE_TAGS,
 	GET_LATEST_VERSION_IMAGES,
 } from '../queries/imageQueries';
-import { useNavigate } from 'react-router-dom';
+import {
+	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGE,
+	USER_SHOPPING_CART_IMAGES,
+} from '../queries/shoppingCartQueries';
 
 const ShoppingCart = () => {
 	const navigate = useNavigate();

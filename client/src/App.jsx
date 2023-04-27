@@ -1,32 +1,54 @@
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.scss';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
-import Header from './components/Header';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
 import Footer from './components/Footer';
-import ImagePage from './pages/ImagePage';
-import NotFound from './pages/NotFound';
-import AdminUsers from './pages/AdminUsers';
+import Header from './components/Header';
 import AdminImages from './pages/AdminImages';
+import AdminUsers from './pages/AdminUsers';
+import Home from './pages/Home';
+import ImagePage from './pages/ImagePage';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
+import Register from './pages/Register';
 
+import { createUploadLink } from 'apollo-upload-client';
 import { Provider } from 'react-redux';
-import { store } from './app/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getMe } from './features/auth/authSlice';
-import ShoppingCart from './pages/ShoppingCart';
+import { store } from './app/store';
 import CategoryPage from './pages/CategoryPage';
-import { createUploadLink } from 'apollo-upload-client';
 import OrderConfirmation from './pages/OrderConfirmation';
+import ShoppingCart from './pages/ShoppingCart';
+import VersionHistory from './pages/VersionHistory';
+import UserProfile from './pages/UserProfile';
+import OrderHistory from './pages/OrderHistory';
+
+const typePolicies = {
+	Query: {
+		fields: [
+			'latest_version_images',
+			'image_tags',
+			'shopping_cart_images_by_sc_id',
+			'images_by_tag_name',
+		].reduce((accumulator, fieldName) => {
+			accumulator[fieldName] = {
+				merge(existing, incoming) {
+					return incoming;
+				},
+			};
+			return accumulator;
+		}, {}),
+	},
+};
 
 export const client = new ApolloClient({
 	link: createUploadLink({
 		uri: 'http://localhost:5000/graphql',
 		credentials: 'include',
 	}),
-	cache: new InMemoryCache(),
+	cache: new InMemoryCache({
+		typePolicies,
+	}),
 });
 
 const App = () => {
@@ -46,6 +68,12 @@ const App = () => {
 								<Route path='/admin/images' element={<AdminImages />} />
 								<Route path='/image/:image' element={<ImagePage />} />
 								<Route path='/order/:order' element={<OrderConfirmation />} />
+								<Route path='/profile' element={<UserProfile />} />
+								<Route path='/order-history' element={<OrderHistory />} />
+								<Route
+									path='/version-history/:image'
+									element={<VersionHistory />}
+								/>
 								<Route
 									path='/category/:category'
 									element={<CategoryPage />}

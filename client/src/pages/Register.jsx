@@ -1,15 +1,14 @@
-import { FaUser } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 import { Button, TextField, ThemeProvider } from '@mui/material';
 import { Form, Formik, useField } from 'formik';
-import { theme } from '../style/themes';
+import { useEffect } from 'react';
+import { FaUser } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import YupPassword from 'yup-password';
-import { useSelector, useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
-import { register, reset } from '../features/auth/authSlice';
-import { useEffect } from 'react';
 import Spinner from '../components/Spinner';
+import { register, reset } from '../features/auth/authSlice';
+import { theme } from '../style/themes';
 YupPassword(yup);
 
 const Register = () => {

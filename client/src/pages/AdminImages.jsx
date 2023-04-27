@@ -1,12 +1,12 @@
 import { useQuery } from '@apollo/client';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import AddImageModal from '../components/AddImageModal';
 import AdminImageRow from '../components/AdminImageRow';
 import Spinner from '../components/Spinner';
 import { GET_LATEST_VERSION_IMAGES } from '../queries/imageQueries';
 import '../scss/AdminImages.scss';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 const AdminImages = () => {
 	const navigate = useNavigate();
@@ -37,15 +37,21 @@ const AdminImages = () => {
 							<th scope='col'>Description</th>
 							<th scope='col'>Journalist</th>
 							<th scope='col'>View Metadata</th>
+							<th scope='col'>Version History</th>
 							<th scope='col'>Edit</th>
 							<th scope='col'>Delete</th>
 						</tr>
 					</thead>
 					<tbody>
 						{data?.latest_version_images &&
-							data?.latest_version_images.map(image => (
-								<AdminImageRow image={image.image} key={image.image.image_id} />
-							))}
+							data?.latest_version_images.map(image => {
+								const { image: img } = image;
+								const { image_id: imgId, deleted } = img;
+
+								if (!deleted) {
+									return <AdminImageRow image={img} key={imgId} />;
+								}
+							})}
 					</tbody>
 				</table>
 			</section>

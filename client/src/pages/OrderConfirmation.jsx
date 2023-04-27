@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/client';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { GET_ORDER, GET_ORDER_IMAGES } from '../queries/orderQueries';
 import OrderImageRow from '../components/OrderImageRow';
+import { GET_ORDER, GET_ORDER_IMAGES } from '../queries/orderQueries';
 
 const OrderConfirmation = () => {
 	const { order: order_id } = useParams();

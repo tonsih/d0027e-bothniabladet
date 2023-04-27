@@ -10,6 +10,7 @@ const {
 	GraphQLNonNull,
 } = require('graphql');
 const { GraphQLDateTime, CountryCodeResolver } = require('graphql-scalars');
+const { getNowDateISOString } = require('../utils/utils.cjs');
 const { GraphQLUpload } = require('graphql-upload');
 const { models, sequelize } = require('../configs/db/db');
 const {
@@ -41,17 +42,6 @@ require('dotenv').config();
 
 const throwErrorWithMessage = (message = 'Something went wrong') => {
 	throw new Error(message);
-};
-
-const getNowDateISOString = () => {
-	const now = DateTime.now()
-		.setZone('Europe/Stockholm')
-		.toJSDate()
-		.toLocaleString('en-US', { timeZone: 'Europe/Stockholm' });
-
-	const isoOrderDate = new Date(now);
-	isoOrderDate.setHours(isoOrderDate.getHours() + 2);
-	return (isoString = isoOrderDate.toISOString());
 };
 
 const UserType = new GraphQLObjectType({
@@ -111,6 +101,7 @@ const ImageType = new GraphQLObjectType({
 		description: { type: GraphQLString },
 		journalist: { type: GraphQLString },
 		distributable: { type: GraphQLBoolean },
+		deleted: { type: GraphQLBoolean },
 	}),
 });
 
@@ -278,8 +269,8 @@ const RootQuery = new GraphQLObjectType({
 		user: {
 			type: UserType,
 			args: { user_id: { type: GraphQLID } },
-			async resolve(_, args) {
-				return await user.findByPk(args.user_id);
+			async resolve(_, { user_id }) {
+				return await user.findByPk(user_id);
 			},
 		},
 		users: {
@@ -325,6 +316,27 @@ const RootQuery = new GraphQLObjectType({
 				return await image.findByPk(args.image_id);
 			},
 		},
+		all_versions_image: {
+			type: GraphQLList(VersionType),
+			args: { image_id: { type: GraphQLID } },
+			async resolve(_, { image_id }) {
+				try {
+					const { original_id } = await version.findOne({
+						where: {
+							image_id,
+						},
+					});
+
+					return await version.findAll({
+						where: {
+							original_id,
+						},
+					});
+				} catch (error) {
+					throwErrorWithMessage();
+				}
+			},
+		},
 		images: {
 			type: GraphQLList(ImageType),
 			async resolve() {
@@ -355,18 +367,40 @@ const RootQuery = new GraphQLObjectType({
 			},
 		},
 		images_by_tag_name: {
-			type: GraphQLList(ImageType),
+			type: GraphQLList(VersionType),
 			args: { tag_name: { type: GraphQLString } },
-			async resolve(_, args) {
-				const { tag_name } = args;
-				const tagRes = await tag.findOne({ where: { name: tag_name } });
-				const { tag_id } = tagRes?.dataValues;
-				const imgIds = (await image_tag.findAll({ where: { tag_id } })).map(
-					image_tag => image_tag?.dataValues?.image_id
-				);
-				return await image.findAll({
+			async resolve(_, { tag_name }) {
+				const { tag_id: tagId } = await tag.findOne({
+					where: { name: tag_name },
+				});
+
+				const subquery =
+					'(SELECT MAX(version_no) FROM version AS v WHERE v.original_id = version.original_id)';
+				const versions = await version.findAll({
+					where: sequelize.literal(`version_no = ${subquery}`),
+				});
+
+				let latestVerImgIds = [];
+				for (let version of versions) {
+					latestVerImgIds.push(version?.image_id);
+				}
+
+				const imgTags = await image_tag.findAll({
 					where: {
-						image_id: imgIds,
+						image_id: latestVerImgIds,
+						tag_id: tagId,
+					},
+				});
+
+				let imgs = [];
+
+				for (let imgTag of imgTags) {
+					imgs.push(imgTag.image_id);
+				}
+
+				return await version.findAll({
+					where: {
+						image_id: imgs,
 					},
 				});
 			},
@@ -382,14 +416,29 @@ const RootQuery = new GraphQLObjectType({
 			type: GraphQLList(ImageTagType),
 			args: { image_id: { type: GraphQLNonNull(GraphQLID) } },
 			async resolve(_, { image_id }) {
-				console.log(await image_tag.findAll({ where: { image_id } }));
 				return await image_tag.findAll({ where: { image_id } });
 			},
 		},
 		image_tags: {
 			type: GraphQLList(ImageTagType),
 			async resolve() {
-				return await image_tag.findAll();
+				const subquery =
+					'(SELECT MAX(version_no) FROM version AS v WHERE v.original_id = version.original_id)';
+				const versions = await version.findAll({
+					where: sequelize.literal(`version_no = ${subquery}`),
+				});
+
+				let latestVerImgIds = [];
+
+				for (let version of versions) {
+					latestVerImgIds.push(version?.image_id);
+				}
+
+				return await image_tag.findAll({
+					where: {
+						image_id: latestVerImgIds,
+					},
+				});
 			},
 		},
 		order: {
@@ -403,6 +452,20 @@ const RootQuery = new GraphQLObjectType({
 			type: GraphQLList(OrderType),
 			async resolve() {
 				return await order.findAll();
+			},
+		},
+		user_orders: {
+			type: GraphQLList(OrderType),
+			async resolve(_, __, { session }) {
+				try {
+					if (session?.userId) {
+						return await order.findAll({
+							where: { user_id: session.userId },
+						});
+					}
+				} catch (error) {
+					throwErrorWithMessage();
+				}
 			},
 		},
 		order_image: {
@@ -653,32 +716,6 @@ const mutation = new GraphQLObjectType({
 				});
 			},
 		},
-		deleteImage: {
-			type: ImageType,
-			args: { image_id: { type: GraphQLNonNull(GraphQLID) } },
-			async resolve(_, args, { url }) {
-				const deletedImage = image.findByPk(args.image_id);
-
-				try {
-					await image.destroy({
-						where: {
-							image_id: args.image_id,
-						},
-					});
-
-					let imgPath = { ...(await deletedImage) }.dataValues?.image_url;
-
-					if (imgPath) imgPath = path.join(__dirname, '..', '/images', imgPath);
-
-					if (imgPath && existsSync(imgPath)) unlinkSync(imgPath);
-				} catch (error) {
-					console.log(error);
-					throwErrorWithMessage();
-				}
-
-				return await deletedImage;
-			},
-		},
 		addImage: {
 			type: ImageType,
 			args: {
@@ -716,8 +753,6 @@ const mutation = new GraphQLObjectType({
 				try {
 					let tm;
 
-					const isoString = getNowDateISOString();
-
 					if (coordinates || camera_type || format || last_modified || size) {
 						tm = await technical_metadata.create({
 							coordinates: coordinates || null,
@@ -742,7 +777,7 @@ const mutation = new GraphQLObjectType({
 						version_no: 1,
 						image_id: img?.image_id,
 						original_id: img?.image_id,
-						created_at: isoString,
+						created_at: getNowDateISOString(),
 					});
 
 					if (image_file) {
@@ -785,6 +820,7 @@ const mutation = new GraphQLObjectType({
 				uses: { type: GraphQLInt, defaultValue: 0 },
 				distributable: { type: GraphQLBoolean, defaultValue: false },
 				journalist: { type: GraphQLString },
+				image_url: { type: GraphQLString },
 				image_file: { type: GraphQLUpload },
 				description: { type: GraphQLString },
 				coordinates: { type: GraphQLString },
@@ -802,6 +838,7 @@ const mutation = new GraphQLObjectType({
 					uses,
 					distributable,
 					journalist,
+					image_url,
 					image_file,
 					description,
 					coordinates,
@@ -809,10 +846,31 @@ const mutation = new GraphQLObjectType({
 					format,
 					last_modified,
 					size,
-				}
+				},
+				{ url }
 			) {
 				try {
-					let tm;
+					let { technical_metadata_id: tmId } = await image.findOne({
+						where: { image_id },
+					});
+
+					let tm = await technical_metadata.findOne({
+						where: {
+							technical_metadata_id: tmId,
+						},
+					});
+
+					let filename;
+
+					if (image_url && !image_file) {
+						filename = image_url.replace(url + '/images', '').substring(1);
+
+						tm = await technical_metadata.findOne({
+							where: {
+								technical_metadata_id: tmId,
+							},
+						});
+					}
 
 					const newImg = await image.create({
 						title,
@@ -821,23 +879,36 @@ const mutation = new GraphQLObjectType({
 						distributable,
 						journalist,
 						description,
+						image_url: image_file ? null : filename || null,
 					});
 
 					const { image_id: new_image_id } = newImg;
 
 					if (coordinates || camera_type || format || last_modified || size) {
-						tm = await technical_metadata.create({
-							coordinates,
-							camera_type,
-							format,
-							last_modified,
-							size,
-						});
+						let tmCoordinates, tmCameraType, tmformat, tmLastModified, tmSize;
 
-						await newImg.update({
-							technical_metadata_id: tm?.technical_metadata_id,
+						if (tm) {
+							({
+								coordinates: tmCoordinates,
+								camera_type: tmCameraType,
+								format: tmformat,
+								last_modified: tmLastModified,
+								size: tmSize,
+							} = tm);
+						}
+
+						tm = await technical_metadata.create({
+							coordinates: coordinates || tmCoordinates || null,
+							camera_type: camera_type || tmCameraType || null,
+							format: format || tmformat || null,
+							last_modified: last_modified || tmLastModified || null,
+							size: size || tmSize || null,
 						});
 					}
+
+					await newImg.update({
+						technical_metadata_id: tm?.technical_metadata_id,
+					});
 
 					const oldVersion = await version.findOne({ where: { image_id } });
 
@@ -872,6 +943,26 @@ const mutation = new GraphQLObjectType({
 								image_url: filename,
 							});
 						});
+					}
+
+					const scimgs = await shopping_cart_image.findAll({
+						where: {
+							image_id,
+						},
+					});
+
+					for (let scimg of scimgs) {
+						const { shopping_cart_image_id } = scimg;
+						await shopping_cart_image.update(
+							{
+								image_id: new_image_id,
+							},
+							{
+								where: {
+									shopping_cart_image_id,
+								},
+							}
+						);
 					}
 
 					return newImg;
@@ -1177,29 +1268,88 @@ const mutation = new GraphQLObjectType({
 			},
 		},
 		deleteImage: {
-			type: ImageType,
+			type: GraphQLList(ImageType),
 			args: { image_id: { type: GraphQLNonNull(GraphQLID) } },
-			async resolve(_, args, { url }) {
-				const deletedImage = image.findByPk(args.image_id);
-
+			async resolve(_, { image_id }, { url }) {
+				let deletedImages = [];
 				try {
-					await image.destroy({
+					const { original_id } = await version.findOne({
 						where: {
-							image_id: args.image_id,
+							image_id,
 						},
 					});
 
-					let imgPath = { ...(await deletedImage) }.dataValues?.image_url;
+					const imgVersions = await version.findAll({
+						where: {
+							original_id,
+						},
+					});
 
-					if (imgPath) imgPath = path.join(__dirname, '..', '/images', imgPath);
+					let imgIds = [];
 
-					if (imgPath && existsSync(imgPath)) unlinkSync(imgPath);
+					for (let imgVer of imgVersions) {
+						const { image_id: imgId } = imgVer;
+
+						imgIds.push(imgId);
+						deletedImages.push(imgVer);
+					}
+
+					await image.update(
+						{
+							deleted: true,
+						},
+						{
+							where: {
+								image_id: imgIds,
+							},
+						}
+					);
+
+					await shopping_cart_image.destroy({
+						where: {
+							image_id: imgIds,
+						},
+					});
+
+					return deletedImages;
 				} catch (error) {
 					console.log(error);
 					throwErrorWithMessage();
 				}
+			},
+		},
+		restoreDeletedImages: {
+			type: GraphQLList(ImageType),
+			async resolve(_, { image_id }, { url }) {
+				try {
+					const returnedImgs = [];
+					const imgVersions = await version.findAll();
+					let imgIds = [];
 
-				return await deletedImage;
+					for (let imgVer of imgVersions) {
+						const { image_id: imgId } = imgVer;
+
+						imgIds.push(imgId);
+						returnedImgs.push(imgVer);
+					}
+
+					await image.update(
+						{
+							deleted: false,
+						},
+						{
+							where: {
+								image_id: imgIds,
+							},
+						}
+					);
+
+					console.log(returnedImgs);
+					return returnedImgs;
+				} catch (error) {
+					console.log(error);
+					throwErrorWithMessage();
+				}
 			},
 		},
 		deleteImageTag: {
@@ -1380,23 +1530,25 @@ const mutation = new GraphQLObjectType({
 				banned: { type: GraphQLBoolean },
 				admin: { type: GraphQLBoolean },
 			},
-			async resolve(_, args) {
-				const {
-					user_id,
-					first_name,
-					last_name,
-					email,
-					password,
-					banned,
-					admin,
-				} = args;
+			async resolve(
+				_,
+				{ user_id, first_name, last_name, email, password, banned, admin }
+			) {
+				let hashedPassword;
+
+				if (password) {
+					hashedPassword = await bcrypt.hash(
+						password,
+						parseInt(process.env.SALT)
+					);
+				}
 
 				await user.update(
 					{
 						first_name,
 						last_name,
 						email,
-						password,
+						password: hashedPassword,
 						banned,
 						admin,
 					},

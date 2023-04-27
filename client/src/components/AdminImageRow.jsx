@@ -1,21 +1,24 @@
-import { useMutation, useQuery } from '@apollo/client';
-import {
-	FaCheck,
-	FaCheckCircle,
-	FaCross,
-	FaEdit,
-	FaInfoCircle,
-	FaTrash,
-} from 'react-icons/fa';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { FaCheckCircle, FaHistory, FaTrash } from 'react-icons/fa';
 import { DELETE_IMAGE } from '../mutations/imageMutations';
 import {
+	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_IMAGE_TAGS,
 	GET_LATEST_VERSION_IMAGES,
 	GET_TECHNICAL_METADATA,
+	GET_IMAGES_BY_TAG_NAME,
 } from '../queries/imageQueries';
 import ActionButton from './ActionButton';
-import MetadataModal from './MetadataModal';
 import EditImageModal from './EditImageModal';
+import MetadataModal from './MetadataModal';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import {
+	USER_SHOPPING_CART,
+	USER_SHOPPING_CART_IMAGES,
+} from '../queries/shoppingCartQueries';
+import { useEffect, useState } from 'react';
+import _ from 'lodash';
 
 const AdminImageRow = ({ image }) => {
 	const {
@@ -29,11 +32,17 @@ const AdminImageRow = ({ image }) => {
 		distributable,
 	} = image;
 	const [deleteImage] = useMutation(DELETE_IMAGE, {
-		refetchQueries: [
-			{ query: GET_LATEST_VERSION_IMAGES },
-			{ query: GET_IMAGE_TAGS },
-		],
+		// refetchQueries: [
+		// 	{ query: GET_LATEST_VERSION_IMAGES },
+		// 	{ query: GET_IMAGE_TAGS },
+		// ],
 	});
+
+	const { user, isLoading, isError, isSuccess, message } = useSelector(
+		state => state.auth
+	);
+
+	const [imgTagNames, setImgTagNames] = useState([]);
 
 	const {
 		data: tmData,
@@ -42,6 +51,33 @@ const AdminImageRow = ({ image }) => {
 	} = useQuery(GET_TECHNICAL_METADATA, {
 		variables: { image_id },
 	});
+
+	const [getITBIData, { data: itbiData }] = useLazyQuery(
+		GET_IMAGE_TAGS_BY_IMAGE_ID
+	);
+
+	useEffect(() => {
+		const getITBIDataFunc = async () => {
+			await getITBIData({
+				variables: {
+					image_id,
+				},
+			});
+		};
+
+		if (image_id) {
+			getITBIDataFunc();
+		}
+	}, [image_id]);
+
+	useEffect(() => {
+		if (itbiData?.image_tags_by_image_id) {
+			for (let imgTag of itbiData?.image_tags_by_image_id) {
+				const { name: imgTagName } = imgTag?.tag;
+				setImgTagNames([...imgTagNames, imgTagName]);
+			}
+		}
+	}, [itbiData?.image_tags_by_image_id]);
 
 	return (
 		<>
@@ -68,6 +104,15 @@ const AdminImageRow = ({ image }) => {
 					)}
 				</td>
 				<td>
+					<Link to={`/version-history/${image_id}`}>
+						<ActionButton variant='contained' color='secondary' className='btn'>
+							<h6 className='p-0 m-0'>
+								<FaHistory />
+							</h6>
+						</ActionButton>
+					</Link>
+				</td>
+				<td>
 					<EditImageModal imageToEdit={image} />
 				</td>
 				<td>
@@ -77,9 +122,72 @@ const AdminImageRow = ({ image }) => {
 						className='btn'
 						onClick={async () => {
 							try {
+								const refetchQueries = imgTagNames.map(tagName => ({
+									query: GET_IMAGES_BY_TAG_NAME,
+									variables: {
+										tag_name: tagName,
+									},
+								}));
+
 								await deleteImage({
 									variables: {
 										image_id,
+									},
+									refetchQueries: [
+										{
+											query: USER_SHOPPING_CART,
+											variables: {
+												user_id: user?.me?.user_id,
+											},
+										},
+										...refetchQueries,
+									],
+									update(cache, { data: { deleteImage } }) {
+										const { latest_version_images } = cache.readQuery({
+											query: GET_LATEST_VERSION_IMAGES,
+										});
+
+										cache.writeQuery({
+											query: GET_LATEST_VERSION_IMAGES,
+											data: {
+												latest_version_images: latest_version_images.filter(
+													verImage => verImage.image.image_id !== image_id
+												),
+											},
+										});
+
+										const { image_tags } = cache.readQuery({
+											query: GET_IMAGE_TAGS,
+										});
+										cache.writeQuery({
+											query: GET_IMAGE_TAGS,
+											data: {
+												image_tags: image_tags.filter(
+													imgTag => imgTag.image.image_id !== image_id
+												),
+											},
+										});
+
+										const { shopping_cart_images_by_sc_id: scImgs } =
+											cache.readQuery({
+												query: USER_SHOPPING_CART_IMAGES,
+												variables: {
+													shopping_cart_id:
+														user?.shopping_cart?.shopping_cart_id,
+												},
+											});
+
+										cache.writeQuery({
+											query: USER_SHOPPING_CART_IMAGES,
+											variables: {
+												shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
+											},
+											data: {
+												shopping_cart_images_by_sc_id: scImgs.filter(
+													scImg => scImg.image.image_id !== image_id
+												),
+											},
+										});
 									},
 								});
 							} catch (error) {

@@ -57,6 +57,7 @@ const UPDATE_IMAGE = gql`
 		$price: Float!
 		$uses: Int!
 		$image_file: Upload
+		$image_url: String
 		$description: String
 		$journalist: String
 		$coordinates: String
@@ -72,6 +73,7 @@ const UPDATE_IMAGE = gql`
 			price: $price
 			uses: $uses
 			image_file: $image_file
+			image_url: $image_url
 			description: $description
 			journalist: $journalist
 			coordinates: $coordinates
