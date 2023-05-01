@@ -22,6 +22,8 @@ import ShoppingCart from './pages/ShoppingCart';
 import VersionHistory from './pages/VersionHistory';
 import UserProfile from './pages/UserProfile';
 import OrderHistory from './pages/OrderHistory';
+import ImageRequest from './pages/ImageRequest';
+import AdminImageRequests from './pages/AdminImageRequests';
 
 const typePolicies = {
 	Query: {
@@ -70,6 +72,11 @@ const App = () => {
 								<Route path='/order/:order' element={<OrderConfirmation />} />
 								<Route path='/profile' element={<UserProfile />} />
 								<Route path='/order-history' element={<OrderHistory />} />
+								<Route path='/image-request' element={<ImageRequest />} />
+								<Route
+									path='/admin/image-requests'
+									element={<AdminImageRequests />}
+								/>
 								<Route
 									path='/version-history/:image'
 									element={<VersionHistory />}

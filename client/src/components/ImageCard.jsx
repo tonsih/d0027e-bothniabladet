@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { StyledLink } from '../style/styledComponents/StyledLink';
 import ActionButton from './ActionButton';
+import '../scss/ImageCard.scss';
 
 const ImageCard = ({ image }) => {
 	const { image_id, title, price, uses, description, image_url } = image;

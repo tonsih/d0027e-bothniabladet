@@ -25,7 +25,7 @@ const OrderHistory = () => {
 	}, [uoData]);
 
 	return (
-		<section>
+		<section className='table-responsive'>
 			<table className='table table-dark table-hover'>
 				<thead>
 					<tr>
@@ -40,13 +40,6 @@ const OrderHistory = () => {
 						orders.map(order => (
 							<OrderHistoryRow key={order?.order_id} order={order} />
 						))}
-					{/* // data.shopping_cart_images_by_sc_id.map(image => (
-							// 	<ShoppingCartImageRow
-							// 		image={image}
-							// 		userId={user.me.user_id}
-							// 		key={image.image.image_id}
-							// 	/>
-							// ))} */}
 				</tbody>
 			</table>
 		</section>

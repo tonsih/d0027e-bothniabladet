@@ -5,7 +5,7 @@ import { FaInfoCircle } from 'react-icons/fa';
 import ActionButton from './ActionButton';
 import ImageMap from './ImageMap';
 
-const MetadataModal = ({ metadata, image }) => {
+const MetadataModal = ({ metadata, image, adminImageCard = false }) => {
 	const [show, setShow] = useState(false);
 
 	const handleClose = () => {
@@ -28,12 +28,13 @@ const MetadataModal = ({ metadata, image }) => {
 	return (
 		<>
 			<ActionButton
-				variant='contained'
-				color='green'
-				className='btn p-2'
+				variant='outlined'
+				color='primary'
+				className={`btn ${adminImageCard ? 'w-100 p-3' : 'p-2'}`}
 				onClick={handleShow}
+				startIcon={adminImageCard && <FaInfoCircle />}
 			>
-				<FaInfoCircle />
+				{adminImageCard ? <span>View Metadata</span> : <FaInfoCircle />}
 			</ActionButton>
 
 			<Modal show={show} onHide={handleClose}>

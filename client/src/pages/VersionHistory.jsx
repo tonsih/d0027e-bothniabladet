@@ -19,7 +19,7 @@ const VersionHistory = () => {
 	}, [imgId]);
 
 	return (
-		<section>
+		<section className='table-responsive'>
 			<Link to={`/admin/images`}>
 				<ActionButton variant='outlined' color='primary' className='w-100 p-3'>
 					Go back to image admin panel
@@ -32,12 +32,6 @@ const VersionHistory = () => {
 						<th scope='col'>Version No.</th>
 						<th scope='col'>Image</th>
 						<th scope='col'>View Details</th>
-						{/* <th scope='col'>Title</th>
-						<th scope='col'>Price</th>
-						<th scope='col'>Distributable</th>
-						<th scope='col'>Uses</th>
-						<th scope='col'>Description</th>
-						<th scope='col'>Journalist</th> */}
 						<th scope='col'>View Metadata</th>
 					</tr>
 				</thead>

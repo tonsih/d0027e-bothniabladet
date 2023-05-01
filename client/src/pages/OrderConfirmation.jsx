@@ -25,7 +25,7 @@ const OrderConfirmation = () => {
 
 	return (
 		<>
-			<section>
+			<section className='table-responsive'>
 				<h1>Order confirmed</h1>
 				<h4>Order details</h4>
 				<table className='table table-dark table-hover'>

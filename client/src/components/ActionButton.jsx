@@ -11,6 +11,7 @@ const ActionButton = ({
 	startIcon,
 	endIcon,
 	type,
+	id,
 }) => {
 	return (
 		<ThemeProvider theme={theme}>
@@ -23,6 +24,7 @@ const ActionButton = ({
 				startIcon={startIcon}
 				endIcon={endIcon}
 				type={type}
+				id={id}
 			>
 				{children}
 			</Button>

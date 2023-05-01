@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { GET_IMAGE_TAGS } from '../queries/imageQueries';
 import { theme } from '../style/themes';
 import MenuButton from './MenuButton';
+import { LinkContainer } from 'react-router-bootstrap';
+import { NavDropdown } from 'react-bootstrap';
 
 export default function CategoriesButton() {
 	const { data, loading, error } = useQuery(GET_IMAGE_TAGS);
@@ -23,10 +25,50 @@ export default function CategoriesButton() {
 		});
 	}
 
+	// 	const AdminNavItem = () => {
+	// 	return (
+	// 		<NavDropdown
+	// 			title={
+	// 				<span className='admin-panel-title'>
+	// 					<FaCog /> AdminPanel
+	// 				</span>
+	// 			}
+	// 			id={`offcanvasNavbarDropdown-expand-lg`}
+	// 		>
+	// 			<LinkContainer to='/admin/users'>
+	// 				<NavDropdown.Item>Users</NavDropdown.Item>
+	// 			</LinkContainer>
+	// 			<LinkContainer to='/admin/images'>
+	// 				<NavDropdown.Item>Images</NavDropdown.Item>
+	// 			</LinkContainer>
+	// 		</NavDropdown>
+	// 	);
+	// };
+
 	return (
 		categoriesSet.size > 0 && (
 			<>
-				<PopupState variant='popover' popupId='demo-popup-menu'>
+				<NavDropdown
+					title={
+						<span className='categies-menu-title'>
+							<FaList /> Categories
+						</span>
+					}
+					id={`offcanvasNavbarDropdown-expand-lg`}
+				>
+					{categoriesSet &&
+						categoriesSet.size > 0 &&
+						[...categoriesSet].map(category => (
+							<LinkContainer
+								key={category}
+								to={`/category/${category.toLowerCase()}`}
+							>
+								<NavDropdown.Item>{category}</NavDropdown.Item>
+							</LinkContainer>
+						))}
+				</NavDropdown>
+
+				{/* <PopupState variant='popover' popupId='demo-popup-menu'>
 					{popupState => (
 						<React.Fragment>
 							<ThemeProvider theme={theme}>
@@ -55,7 +97,7 @@ export default function CategoriesButton() {
 							</ThemeProvider>
 						</React.Fragment>
 					)}
-				</PopupState>
+				</PopupState> */}
 			</>
 		)
 	);

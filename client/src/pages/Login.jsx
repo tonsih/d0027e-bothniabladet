@@ -66,17 +66,17 @@ const Login = ({ client }) => {
 
 	return (
 		<>
-			{isError && message && message.error && (
+			{isError && message?.error && (
 				<div className='alert alert-danger' role='alert'>
 					{message.error[0]}
 				</div>
 			)}
-			{user && user.banned && (
+			{user?.banned && (
 				<div className='alert alert-danger' role='alert'>
 					This account is banned!
 				</div>
 			)}
-			{isSuccess && !isError && message && message.success && (
+			{isSuccess && !isError && message?.success && (
 				<div className='alert alert-success' role='alert'>
 					{message.success}
 				</div>

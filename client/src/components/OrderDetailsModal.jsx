@@ -46,7 +46,7 @@ const OrderDetailsModal = ({ order, show, handleClose, handleShow }) => {
 					<Modal.Title>Order details</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className='d-flex justify-content-center flex-column'>
-					<section>
+					<section className='table-responsive'>
 						<table className='table table-dark table-hover'>
 							<thead>
 								<tr>

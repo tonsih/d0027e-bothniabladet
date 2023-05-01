@@ -30,6 +30,7 @@ import {
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import { useSelector } from 'react-redux';
+import '../scss/EditImageModal.scss';
 
 const MyTextField = ({
 	placeholder,
@@ -95,7 +96,7 @@ const MyTagTextField = ({
 	);
 };
 
-const EditImageModal = ({ imageToEdit }) => {
+const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 	const {
 		image_id: imgId,
 		title: imgTitle,
@@ -188,11 +189,13 @@ const EditImageModal = ({ imageToEdit }) => {
 	return (
 		<>
 			<ActionButton
-				variant='contained'
-				className='btn p-2'
+				variant='outlined'
+				color='primary'
+				className={`btn ${adminImageCard ? 'w-100 p-3' : 'p-2'}`}
 				onClick={handleShow}
+				startIcon={adminImageCard && <FaEdit />}
 			>
-				<FaEdit />
+				{adminImageCard ? <span>Edit Image</span> : <FaEdit />}
 			</ActionButton>
 
 			<Modal show={show} onHide={handleClose}>
@@ -219,8 +222,8 @@ const EditImageModal = ({ imageToEdit }) => {
 										title !== imgTitle ||
 										price !== imgPrice ||
 										description !== imgDescription ||
-										(uses !== imgUses && !_.isEmpty(title)) ||
-										(journalist !== imgJournalist && !_.isEmpty(title)) ||
+										uses !== imgUses ||
+										journalist !== imgJournalist ||
 										image ||
 										distributable !== imgDistributable ||
 										!_.isEqual(oldTags, tags)
@@ -233,6 +236,13 @@ const EditImageModal = ({ imageToEdit }) => {
 												true
 											));
 										}
+
+										const refetchQueries = oldTags.map(tagName => ({
+											query: GET_IMAGES_BY_TAG_NAME,
+											variables: {
+												tag_name: tagName,
+											},
+										}));
 
 										const newImage = await updateImage({
 											variables: {
@@ -273,6 +283,10 @@ const EditImageModal = ({ imageToEdit }) => {
 														user_id: user?.me?.user_id,
 													},
 												},
+												{
+													query: GET_IMAGE_TAGS,
+												},
+												...refetchQueries,
 											],
 										});
 
@@ -285,23 +299,86 @@ const EditImageModal = ({ imageToEdit }) => {
 													image_id: new_image_id,
 													name: tagName,
 												},
-												refetchQueries: [
-													{
-														query: GET_IMAGE_TAGS,
-													},
-													{
-														query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-														variables: {
-															image_id: new_image_id,
-														},
-													},
-													{
-														query: GET_IMAGES_BY_TAG_NAME,
-														variables: {
-															tag_name: tagName,
-														},
-													},
-												],
+												// refetchQueries: [
+												// 	{
+												// 		query: GET_IMAGE_TAGS,
+												// 	},
+												// 	{
+												// 		query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+												// 		variables: {
+												// 			image_id: new_image_id,
+												// 		},
+												// 	},
+												// 	{
+												// 		query: GET_IMAGES_BY_TAG_NAME,
+												// 		variables: {
+												// 			tag_name: tagName,
+												// 		},
+												// 	},
+												// ],
+												update(cache, { data: { createImageTag } }) {
+													const { tag } = createImageTag;
+
+													const { image_tags } =
+														cache.readQuery({
+															query: GET_IMAGE_TAGS,
+														}) || {};
+
+													if (image_tags) {
+														cache.writeQuery({
+															query: GET_IMAGE_TAGS,
+															data: {
+																image_tags: [...image_tags, createImageTag],
+															},
+														});
+													}
+
+													const { images_by_tag_name } =
+														cache.readQuery({
+															query: GET_IMAGES_BY_TAG_NAME,
+															variables: {
+																tag_name: tag?.name,
+															},
+														}) || {};
+
+													if (images_by_tag_name) {
+														cache.writeQuery({
+															query: GET_IMAGES_BY_TAG_NAME,
+															variables: {
+																tag_name: tag?.name,
+															},
+															data: {
+																images_by_tag_name: [
+																	...images_by_tag_name,
+																	createImageTag,
+																],
+															},
+														});
+													}
+
+													const { image_tags_by_image_id } =
+														cache.readQuery({
+															query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+															variables: {
+																image_id: new_image_id,
+															},
+														}) || {};
+
+													if (image_tags_by_image_id) {
+														cache.writeQuery({
+															query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+															variables: {
+																image_id: new_image_id,
+															},
+															data: {
+																image_tags_by_image_id: [
+																	...image_tags_by_image_id,
+																	createImageTag,
+																],
+															},
+														});
+													}
+												},
 											});
 										}
 									}
@@ -368,16 +445,17 @@ const EditImageModal = ({ imageToEdit }) => {
 											onClick={() => {
 												handleAddTag(tagInputValue);
 											}}
-											variant='primary'
-											className='ml-auto'
+											className='mt-3'
+											id='add-tag-button'
+											color='primary'
 										>
 											<FaPlus />
 										</ActionButton>
 										{tags && tags.size > 0 && (
-											<div className='tagContainer'>
-												<ul className='list-unstyled d-flex flex-wrap mt-3'>
+											<div className='tags-container'>
+												<ul className='list-unstyled d-flex flex-wrap mt-2'>
 													{Array.from(tags).map((tag, index) => (
-														<li key={index}>
+														<li key={index} className='tags-list-item'>
 															<Chip
 																label={tag}
 																color='primary'

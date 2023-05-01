@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import UserRow from '../components/UserRow';
 import { USERS_QUERY } from '../queries/userQueries';
+import { Spinner } from 'react-bootstrap';
 
 const AdminUsers = () => {
 	const navigate = useNavigate();
@@ -18,30 +19,36 @@ const AdminUsers = () => {
 
 	const { data, loading, error } = useQuery(USERS_QUERY);
 
+	if (loading) return <Spinner />;
+
 	return (
 		<>
-			<table className='table table-dark table-hover'>
-				<thead>
-					<tr>
-						<th scope='col'>ID</th>
-						<th scope='col'>First name</th>
-						<th scope='col'>Last name</th>
-						<th scope='col'>E-mail</th>
-						<th scope='col'>Admin</th>
-						<th scope='col'>Banned</th>
-						<th scope='col'>Promote</th>
-						<th scope='col'>Demote</th>
-						<th scope='col'>Ban</th>
-						<th scope='col'>Unban</th>
-						<th scope='col'>Delete User</th>
-					</tr>
-				</thead>
-				<tbody>
-					{!loading &&
-						!error &&
-						data.users.map(user => <UserRow key={user.user_id} user={user} />)}
-				</tbody>
-			</table>
+			<section className='table-responsive'>
+				<table className='table table-dark table-hover'>
+					<thead>
+						<tr>
+							<th scope='col'>ID</th>
+							<th scope='col'>First name</th>
+							<th scope='col'>Last name</th>
+							<th scope='col'>E-mail</th>
+							<th scope='col'>Admin</th>
+							<th scope='col'>Banned</th>
+							<th scope='col'>Promote</th>
+							<th scope='col'>Demote</th>
+							<th scope='col'>Ban</th>
+							<th scope='col'>Unban</th>
+							<th scope='col'>Delete User</th>
+						</tr>
+					</thead>
+					<tbody>
+						{!loading &&
+							!error &&
+							data.users.map(user => (
+								<UserRow key={user.user_id} user={user} />
+							))}
+					</tbody>
+				</table>
+			</section>
 		</>
 	);
 };

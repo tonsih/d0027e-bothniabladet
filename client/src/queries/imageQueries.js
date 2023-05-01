@@ -16,6 +16,18 @@ const GET_IMAGES = gql`
 	}
 `;
 
+const GET_REQUESTED_IMAGES = gql`
+	query requested_images {
+		requested_images {
+			requested_image_id
+			image_url
+			title
+			description
+			journalist
+		}
+	}
+`;
+
 const GET_LATEST_VERSION_IMAGES = gql`
 	query latest_version_images {
 		latest_version_images {
@@ -70,6 +82,29 @@ const GET_IMAGE_TAGS_BY_IMAGE_ID = gql`
 const GET_IMAGES_BY_TAG_NAME = gql`
 	query images_by_tag_name($tag_name: String!) {
 		images_by_tag_name(tag_name: $tag_name) {
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+				deleted
+			}
+		}
+	}
+`;
+
+const GET_VERSION = gql`
+	query version_by_image($image_id: ID!) {
+		version_by_image(image_id: $image_id) {
+			version_id
+			version_no
+			original {
+				image_id
+			}
 			image {
 				image_id
 				title
@@ -144,4 +179,6 @@ export {
 	GET_IMAGE,
 	GET_TECHNICAL_METADATA,
 	GET_ALL_IMAGE_VERSIONS,
+	GET_VERSION,
+	GET_REQUESTED_IMAGES,
 };

@@ -51,7 +51,7 @@ const ShoppingCart = () => {
 
 	return user ? (
 		<>
-			<section>
+			<section className='table-responsive'>
 				<table className='table table-dark table-hover'>
 					<thead>
 						<tr>

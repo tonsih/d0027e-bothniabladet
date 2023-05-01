@@ -46,10 +46,6 @@ footer {
 	object-fit: cover;
 }
 
-.textfield {
-	margin-bottom: 1rem;
-}
-
 a {
 	text-decoration: none;
 
@@ -64,19 +60,4 @@ a {
 
 main {
 	font-family: roboto;
-}
-
-.card {
-	background-color: #171a1d;
-	&:hover {
-		background-color: #171a1da6;
-	}
-
-	li {
-		background-color: transparent;
-	}
-
-	.card-body {
-		color: white;
-	}
 }

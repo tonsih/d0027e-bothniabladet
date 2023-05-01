@@ -98,6 +98,17 @@ create table bothniabladet.image(
 alter table bothniabladet.image alter image_url set default null;
 alter table bothniabladet.image alter deleted set default false;
 
+create table bothniabladet.requested_image(
+  requested_image_id          serial,
+  title                       varchar(50),
+  description                 varchar(300),
+  image_url                   varChar(500),                
+  journalist                  varchar(100),
+  email                       varchar(50)   not null,
+
+  constraint pk_requested_image primary key(requested_image_id)
+);
+
 create table bothniabladet.version(
   version_id                  serial,
   version_no                  bigint        unsigned     not null,

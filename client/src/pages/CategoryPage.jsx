@@ -5,6 +5,7 @@ import Spinner from '../components/Spinner';
 import { GET_IMAGES_BY_TAG_NAME } from '../queries/imageQueries';
 import SearchFieldWithImages from '../components/SearchFieldWithImages';
 import { useEffect, useState } from 'react';
+import Images from '../components/Images';
 
 const CategoryPage = () => {
 	const { category: tagName } = useParams();
@@ -35,7 +36,10 @@ const CategoryPage = () => {
 
 	return (
 		<>
-			<SearchFieldWithImages images={images} />
+			<span className='category-title'>
+				<h1>Category: {tagName}</h1>
+			</span>
+			<SearchFieldWithImages images={images} ImagesComponent={Images} />
 		</>
 	);
 };

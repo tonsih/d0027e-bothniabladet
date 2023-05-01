@@ -44,6 +44,13 @@ let theme = createTheme({
 				},
 			},
 		},
+		MuiCheckbox: {
+			styleOverrides: {
+				root: {
+					color: 'white',
+				},
+			},
+		},
 		MuiPaper: {
 			styleOverrides: {
 				root: {

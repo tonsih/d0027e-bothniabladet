@@ -35,16 +35,55 @@ const ADD_IMAGE = gql`
 			size: $size
 			distributable: $distributable
 		) {
-			technical_metadata {
-				technical_metadata_id
+			version_id
+			version_no
+			original {
+				image_id
 			}
-			image_id
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+				deleted
+			}
+		}
+	}
+`;
+
+// addRequestedImage: {
+// 			type: RequestedImageType,
+// 			args: {
+// 				title: { type: GraphQLString },
+// 				email: { type: GraphQLNonNull(GraphQLString) },
+// 				journalist: { type: GraphQLString },
+// 				image_file: { type: GraphQLUpload },
+// 				description: { type: GraphQLString },
+
+const ADD_REQUESTED_IMAGE = gql`
+	mutation addRequestedImage(
+		$title: String
+		$image_file: Upload
+		$description: String
+		$journalist: String
+		$email: String!
+	) {
+		addRequestedImage(
+			title: $title
+			email: $email
+			image_file: $image_file
+			description: $description
+			journalist: $journalist
+		) {
+			requested_image_id
 			title
-			price
-			uses
+			email
 			image_url
 			description
-			distributable
 			journalist
 		}
 	}
@@ -101,11 +140,20 @@ const UPDATE_IMAGE = gql`
 const CREATE_IMAGE_TAG = gql`
 	mutation createImageTag($image_id: ID!, $name: String!) {
 		createImageTag(image_id: $image_id, name: $name) {
-			image {
-				title
-			}
 			tag {
+				tag_id
 				name
+			}
+			image {
+				image_id
+				title
+				price
+				uses
+				image_url
+				description
+				journalist
+				distributable
+				deleted
 			}
 		}
 	}
@@ -165,11 +213,21 @@ const DELETE_IMAGE = gql`
 	}
 `;
 
+const DELETE_REQUESTED_IMAGE = gql`
+	mutation deleteRequestedImage($requested_image_id: ID!) {
+		deleteRequestedImage(requested_image_id: $requested_image_id) {
+			requested_image_id
+		}
+	}
+`;
+
 export {
 	ADD_IMAGE,
+	ADD_REQUESTED_IMAGE,
 	CREATE_IMAGE_TAG,
 	DELETE_IMAGE_TAG,
 	ADD_TECHNICAL_METADATA,
 	UPDATE_IMAGE,
 	DELETE_IMAGE,
+	DELETE_REQUESTED_IMAGE,
 };

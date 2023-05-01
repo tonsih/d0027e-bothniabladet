@@ -1,5 +1,10 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { FaCheckCircle, FaHistory, FaTrash } from 'react-icons/fa';
+import {
+	FaCheckCircle,
+	FaHistory,
+	FaTimesCircle,
+	FaTrash,
+} from 'react-icons/fa';
 import { DELETE_IMAGE } from '../mutations/imageMutations';
 import {
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
@@ -19,8 +24,10 @@ import {
 } from '../queries/shoppingCartQueries';
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
+import { StyledLink } from '../style/styledComponents/StyledLink';
+import '../scss/AdminImageCard.scss';
 
-const AdminImageRow = ({ image }) => {
+const AdminImageCard = ({ image }) => {
 	const {
 		image_id,
 		image_url,
@@ -81,46 +88,64 @@ const AdminImageRow = ({ image }) => {
 
 	return (
 		<>
-			<tr>
-				<th scope='row'>{image_id}</th>
-				<td className='w-25'>
-					<img
-						className='w-75'
-						src={image_url || 'https://placehold.co/500x400'}
-					/>
-				</td>
-				<td>{title}</td>
-				<td>${price}</td>
-				<td>{distributable && <FaCheckCircle />}</td>
-				<td>{uses}</td>
-				<td>{description}</td>
-				<td>{journalist || '\u2014'}</td>
-				<td>
-					{tmData?.technical_metadata_by_image_id?.technical_metadata_id && (
+			<div className='card h-100 mt-3'>
+				{/* <StyledLink to={`/image/${image_id}`} key={image_id} className='w-100'> */}
+				<img
+					className='card-img-top'
+					alt={image_id}
+					src={image_url || 'https://placehold.co/500x400'}
+				/>
+				<div className='card-body'>
+					<h5 className='card-title fs-4'>{title}</h5>
+					<p className='card-text fs-6'>{description}</p>
+				</div>
+				<ul className='list-group list-group-flush'>
+					<li className='list-group-item border-top'>ID: {image_id}</li>
+					<li className='list-group-item border-top'>Price: ${price}</li>
+					<li className='list-group-item border-bottom'>
+						Distributable:{' '}
+						{distributable ? <FaCheckCircle /> : <FaTimesCircle />}
+					</li>
+					<li className='list-group-item border-bottom'>No. uses: {uses}</li>
+					<li className='list-group-item border-bottom'>
+						Journalist: {journalist || '\u2014'}
+					</li>
+				</ul>
+
+				{tmData?.technical_metadata_by_image_id?.technical_metadata_id && (
+					<div className='card-body d-flex align-items-end'>
 						<MetadataModal
 							metadata={tmData?.technical_metadata_by_image_id}
 							image={image}
+							adminImageCard={true}
 						/>
-					)}
-				</td>
-				<td>
-					<Link to={`/version-history/${image_id}`}>
-						<ActionButton variant='outlined' color='primary' className='btn'>
-							<h6 className='p-0 m-0'>
-								<FaHistory />
-							</h6>
+					</div>
+				)}
+
+				<div className='card-body d-flex align-items-end'>
+					<Link to={`/version-history/${image_id}`} className='w-100'>
+						<ActionButton
+							variant='outlined'
+							color='primary'
+							className='btn w-100 p-3'
+							startIcon={<FaHistory />}
+						>
+							Version history
 						</ActionButton>
 					</Link>
-				</td>
-				<td>
-					<EditImageModal imageToEdit={image} />
-				</td>
-				<td>
+				</div>
+
+				<div className='card-body d-flex align-items-end'>
+					<EditImageModal imageToEdit={image} adminImageCard={true} />
+				</div>
+
+				<div className='card-body d-flex align-items-end'>
 					<ActionButton
-						className='btn admin-image-row'
 						id='delete-image-button'
 						variant='outlined'
 						color='secondary'
+						className='btn w-100 p-3'
+						startIcon={<FaTrash />}
 						onClick={async () => {
 							try {
 								const refetchQueries = imgTagNames.map(tagName => ({
@@ -196,13 +221,13 @@ const AdminImageRow = ({ image }) => {
 							}
 						}}
 					>
-						<h6 className='p-0 m-0'>
-							<FaTrash />
-						</h6>
+						Delete image
 					</ActionButton>
-				</td>
-			</tr>
+				</div>
+
+				{/* </StyledLink> */}
+			</div>
 		</>
 	);
 };
-export default AdminImageRow;
+export default AdminImageCard;

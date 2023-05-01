@@ -2,7 +2,12 @@ import { useQuery } from '@apollo/client';
 import Images from '../components/Images';
 import Spinner from '../components/Spinner';
 import { GET_LATEST_VERSION_IMAGES } from '../queries/imageQueries';
-import { TextField, ThemeProvider } from '@mui/material';
+import {
+	TextField,
+	ThemeProvider,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material';
 import '../scss/Home.scss';
 import { theme } from '../style/themes';
 import { useEffect, useState } from 'react';
@@ -13,6 +18,10 @@ const Home = () => {
 	const { loading, error, data } = useQuery(GET_LATEST_VERSION_IMAGES);
 
 	const [images, setImages] = useState([]);
+
+	const theme = useTheme();
+	const isMdWidth = useMediaQuery(theme.breakpoints.down('md'));
+	const isMax992 = useMediaQuery('(max-width:992px)');
 
 	useEffect(() => {
 		if (data?.latest_version_images) {
@@ -34,7 +43,19 @@ const Home = () => {
 	if (error) return <p>Something went wrong</p>;
 	return (
 		<>
-			<SearchFieldWithImages images={images} />
+			{isMax992 ? (
+				<section
+					className={
+						isMax992
+							? 'admin-img-card d-flex flex-column justify-content-center align-items-center'
+							: 'table-responsive'
+					}
+				>
+					<SearchFieldWithImages images={images} ImagesComponent={Images} />
+				</section>
+			) : (
+				<SearchFieldWithImages images={images} ImagesComponent={Images} />
+			)}
 		</>
 	);
 };

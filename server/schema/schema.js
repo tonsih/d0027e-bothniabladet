@@ -21,6 +21,7 @@ const {
 	image_offer,
 	user_offer,
 	image,
+	requested_image,
 	technical_metadata,
 	order,
 	order_image,
@@ -28,7 +29,7 @@ const {
 	shopping_cart_image,
 	version,
 } = models;
-const { createWriteStream, unlinkSync, existsSync } = require('fs');
+const { createWriteStream, unlinkSync, existsSync, unlink } = require('fs');
 const sizeOf = require('image-size');
 const exifr = require('exifr');
 const mime = require('mime-types');
@@ -102,6 +103,26 @@ const ImageType = new GraphQLObjectType({
 		journalist: { type: GraphQLString },
 		distributable: { type: GraphQLBoolean },
 		deleted: { type: GraphQLBoolean },
+	}),
+});
+
+const RequestedImageType = new GraphQLObjectType({
+	name: 'RequestedImage',
+	fields: () => ({
+		requested_image_id: { type: GraphQLID },
+		title: { type: GraphQLString },
+		image_url: {
+			type: GraphQLString,
+			async resolve(parent, _, { url }) {
+				return (
+					(await parent.image_url) &&
+					`${url}/images/requested/${parent.image_url}`
+				);
+			},
+		},
+		description: { type: GraphQLString },
+		journalist: { type: GraphQLString },
+		email: { type: GraphQLNonNull(GraphQLString) },
 	}),
 });
 
@@ -343,6 +364,12 @@ const RootQuery = new GraphQLObjectType({
 				return await image.findAll();
 			},
 		},
+		requested_images: {
+			type: GraphQLList(RequestedImageType),
+			async resolve() {
+				return await requested_image.findAll();
+			},
+		},
 		latest_version_images: {
 			type: GraphQLList(VersionType),
 			async resolve() {
@@ -353,10 +380,21 @@ const RootQuery = new GraphQLObjectType({
 				});
 			},
 		},
+		version_by_image: {
+			type: VersionType,
+			args: { image_id: { type: GraphQLID } },
+			async resolve(_, { image_id }) {
+				return await version.findOne({
+					where: {
+						image_id,
+					},
+				});
+			},
+		},
 		version: {
 			type: VersionType,
 			args: { version_id: { type: GraphQLID } },
-			async resolve(_, { image_id }) {
+			async resolve(_, { version_id }) {
 				return await version.findByPk(version_id);
 			},
 		},
@@ -717,7 +755,7 @@ const mutation = new GraphQLObjectType({
 			},
 		},
 		addImage: {
-			type: ImageType,
+			type: VersionType,
 			args: {
 				title: { type: GraphQLNonNull(GraphQLString) },
 				price: { type: GraphQLNonNull(GraphQLFloat) },
@@ -804,7 +842,53 @@ const mutation = new GraphQLObjectType({
 						});
 					}
 
-					return img;
+					return await version.findOne({ where: { image_id: img.image_id } });
+				} catch (error) {
+					console.log(error);
+					throwErrorWithMessage();
+				}
+			},
+		},
+		addRequestedImage: {
+			type: RequestedImageType,
+			args: {
+				title: { type: GraphQLString },
+				email: { type: GraphQLNonNull(GraphQLString) },
+				journalist: { type: GraphQLString },
+				image_file: { type: GraphQLUpload },
+				description: { type: GraphQLString },
+			},
+			async resolve(_, { title, email, journalist, image_file, description }) {
+				try {
+					const reqImg = await requested_image.create({
+						title,
+						journalist,
+						description,
+						email,
+					});
+
+					if (image_file) {
+						const { mimetype, createReadStream } = await image_file;
+						const filename =
+							reqImg?.requested_image_id + '.' + mime.extension(mimetype);
+						let imgPath = path.join(
+							__dirname,
+							'..',
+							'/images/requested',
+							filename
+						);
+						let stream = await createReadStream().pipe(
+							createWriteStream(imgPath)
+						);
+
+						stream.on('finish', async () => {
+							await reqImg.update({
+								image_url: filename,
+							});
+						});
+					}
+
+					return reqImg;
 				} catch (error) {
 					console.log(error);
 					throwErrorWithMessage();
@@ -1318,6 +1402,40 @@ const mutation = new GraphQLObjectType({
 				}
 			},
 		},
+		deleteRequestedImage: {
+			type: RequestedImageType,
+			args: { requested_image_id: { type: GraphQLNonNull(GraphQLID) } },
+			async resolve(_, { requested_image_id }) {
+				try {
+					const reqImg = await requested_image.findByPk(requested_image_id);
+
+					if (reqImg?.image_url) {
+						const { image_url: imgUrl } = reqImg;
+
+						let imgPath = path.join(
+							__dirname,
+							'..',
+							'/images/requested',
+							imgUrl
+						);
+
+						unlink(imgPath, err => {
+							if (err) {
+								throwErrorWithMessage();
+								return;
+							}
+						});
+					}
+
+					await reqImg.destroy();
+
+					return reqImg;
+				} catch (error) {
+					console.log(error);
+					throwErrorWithMessage();
+				}
+			},
+		},
 		restoreDeletedImages: {
 			type: GraphQLList(ImageType),
 			async resolve(_, { image_id }, { url }) {
@@ -1344,7 +1462,6 @@ const mutation = new GraphQLObjectType({
 						}
 					);
 
-					console.log(returnedImgs);
 					return returnedImgs;
 				} catch (error) {
 					console.log(error);

@@ -4,7 +4,11 @@ import { theme } from '../style/themes';
 import Images from './Images';
 import _ from 'lodash';
 
-const SearchFieldWithImages = ({ images }) => {
+const SearchFieldWithImages = ({
+	images,
+	ImagesComponent,
+	id = 'search-field',
+}) => {
 	const [searchWord, setSearchWord] = useState('');
 	const [filteredImages, setFilteredImages] = useState([]);
 
@@ -14,6 +18,7 @@ const SearchFieldWithImages = ({ images }) => {
 
 	useEffect(() => {
 		let imgArr = [];
+		console.log(images);
 		for (let img of images) {
 			const { title } = img;
 			if (
@@ -24,13 +29,13 @@ const SearchFieldWithImages = ({ images }) => {
 			}
 		}
 		setFilteredImages(imgArr);
-	});
+	}, [images, searchWord]);
 
 	return (
 		<>
 			<ThemeProvider theme={theme}>
 				<TextField
-					id='search-field'
+					id={id}
 					label='Search'
 					variant='outlined'
 					value={searchWord}
@@ -38,7 +43,7 @@ const SearchFieldWithImages = ({ images }) => {
 				/>
 				<div className='images-container mt-3'>
 					{filteredImages.length > 0 ? (
-						<Images images={filteredImages} />
+						<ImagesComponent images={filteredImages} />
 					) : !_.isEmpty(searchWord) ? (
 						<p>No items found</p>
 					) : (

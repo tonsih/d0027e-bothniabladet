@@ -5,6 +5,7 @@ const _image_tag = require('./image_tag');
 const _offer = require('./offer');
 const _order = require('./order');
 const _order_image = require('./order_image');
+const _requested_image = require('./requested_image');
 const _shopping_cart = require('./shopping_cart');
 const _shopping_cart_image = require('./shopping_cart_image');
 const _tag = require('./tag');
@@ -20,6 +21,7 @@ function initModels(sequelize) {
 	const offer = _offer(sequelize, DataTypes);
 	const order = _order(sequelize, DataTypes);
 	const order_image = _order_image(sequelize, DataTypes);
+	const requested_image = _requested_image(sequelize, DataTypes);
 	const shopping_cart = _shopping_cart(sequelize, DataTypes);
 	const shopping_cart_image = _shopping_cart_image(sequelize, DataTypes);
 	const tag = _tag(sequelize, DataTypes);
@@ -175,6 +177,7 @@ function initModels(sequelize) {
 		offer,
 		order,
 		order_image,
+		requested_image,
 		shopping_cart,
 		shopping_cart_image,
 		tag,

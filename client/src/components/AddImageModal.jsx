@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { Checkbox, Chip, TextField, ThemeProvider } from '@mui/material';
 import exifr from 'exifr';
 import { Form, Formik, useField } from 'formik';
@@ -21,10 +21,12 @@ import {
 	GET_IMAGE_TAGS,
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
+	GET_VERSION,
 } from '../queries/imageQueries';
 import '../scss/AddImageModal.scss';
 import { theme } from '../style/themes';
 import ActionButton from './ActionButton';
+import '../scss/TextField.scss';
 
 const MyTextField = ({
 	placeholder,
@@ -90,7 +92,7 @@ const MyTagTextField = ({
 	);
 };
 
-const AddImageModal = () => {
+const AddImageModal = ({ adminImageCard, id }) => {
 	const uploadFileMutation = gql`
 		mutation ($file: Upload!) {
 			uploadFile(file: $file)
@@ -161,11 +163,12 @@ const AddImageModal = () => {
 	return (
 		<>
 			<ActionButton
-				variant='contained'
-				color='green'
-				startIcon={<FaPlus />}
-				className='btn p-3'
+				variant='outlined'
+				color='primary'
+				className={`btn ${adminImageCard ? 'w-75 p-3' : 'p-2'}`}
 				onClick={handleShow}
+				startIcon={adminImageCard && <FaPlus />}
+				id={id}
 			>
 				<h6 className='p-0 m-0'>Add Image</h6>
 			</ActionButton>
@@ -239,14 +242,29 @@ const AddImageModal = () => {
 													: null,
 												size: image?.size || null,
 											},
-											refetchQueries: [
-												{
+											// refetchQueries: [
+											// 	{
+											// 		query: GET_LATEST_VERSION_IMAGES,
+											// 	},
+											// ],
+											update(cache, { data: { addImage } }) {
+												const { latest_version_images } = cache.readQuery({
 													query: GET_LATEST_VERSION_IMAGES,
-												},
-											],
+												});
+
+												cache.writeQuery({
+													query: GET_LATEST_VERSION_IMAGES,
+													data: {
+														latest_version_images: [
+															...latest_version_images,
+															addImage,
+														],
+													},
+												});
+											},
 										});
 
-										const { image_id } = addedImage?.data?.addImage;
+										const { image_id } = addedImage?.data?.addImage?.image;
 
 										for (const tagName of Array.from(tags)) {
 											await createImageTag({
@@ -254,23 +272,86 @@ const AddImageModal = () => {
 													image_id,
 													name: tagName,
 												},
-												refetchQueries: [
-													{
-														query: GET_IMAGE_TAGS,
-													},
-													{
-														query: GET_IMAGES_BY_TAG_NAME,
-														variables: {
-															tag_name: tagName,
-														},
-													},
-													{
-														query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-														variables: {
-															image_id,
-														},
-													},
-												],
+												// refetchQueries: [
+												// 	{
+												// 		query: GET_IMAGE_TAGS,
+												// 	},
+												// 	{
+												// 		query: GET_IMAGES_BY_TAG_NAME,
+												// 		variables: {
+												// 			tag_name: tagName,
+												// 		},
+												// 	},
+												// 	{
+												// 		query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+												// 		variables: {
+												// 			image_id,
+												// 		},
+												// 	},
+												// ],
+												update(cache, { data: { createImageTag } }) {
+													const { tag } = createImageTag;
+
+													const { image_tags } =
+														cache.readQuery({
+															query: GET_IMAGE_TAGS,
+														}) || {};
+
+													if (image_tags) {
+														cache.writeQuery({
+															query: GET_IMAGE_TAGS,
+															data: {
+																image_tags: [...image_tags, createImageTag],
+															},
+														});
+													}
+
+													const { images_by_tag_name } =
+														cache.readQuery({
+															query: GET_IMAGES_BY_TAG_NAME,
+															variables: {
+																tag_name: tag?.name,
+															},
+														}) || {};
+
+													if (images_by_tag_name) {
+														cache.writeQuery({
+															query: GET_IMAGES_BY_TAG_NAME,
+															variables: {
+																tag_name: tag?.name,
+															},
+															data: {
+																images_by_tag_name: [
+																	...images_by_tag_name,
+																	createImageTag,
+																],
+															},
+														});
+													}
+
+													const { image_tags_by_image_id } =
+														cache.readQuery({
+															query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+															variables: {
+																image_id,
+															},
+														}) || {};
+
+													if (image_tags_by_image_id) {
+														cache.writeQuery({
+															query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+															variables: {
+																image_id,
+															},
+															data: {
+																image_tags_by_image_id: [
+																	...image_tags_by_image_id,
+																	createImageTag,
+																],
+															},
+														});
+													}
+												},
 											});
 										}
 									} catch (error) {
@@ -337,19 +418,21 @@ const AddImageModal = () => {
 											onClick={() => {
 												handleAddTag(tagInputValue);
 											}}
-											variant='primary'
 											className='mt-3'
+											id='add-tag-button'
+											color='primary'
 										>
 											<FaPlus />
 										</ActionButton>
 										{tags && tags.size > 0 && (
-											<div className='tagContainer'>
-												<ul className='list-unstyled d-flex flex-wrap mt-3'>
+											<div className='tags-container'>
+												<ul className='list-unstyled d-flex flex-wrap mt-2'>
 													{Array.from(tags).map((tag, index) => (
-														<li key={index}>
+														<li key={index} className='tags-list-item'>
 															<Chip
 																label={tag}
 																color='primary'
+																className='tag-chip'
 																onClick={() =>
 																	handleRemoveTag(index, tags, setTags)
 																}

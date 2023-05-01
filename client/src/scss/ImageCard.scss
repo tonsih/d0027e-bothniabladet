@@ -1,0 +1,14 @@
+.card {
+	background-color: #191d20 !important;
+	&:hover {
+		background-color: #171a1d !important;
+	}
+
+	li {
+		background-color: transparent;
+	}
+
+	.card-body {
+		color: white;
+	}
+}

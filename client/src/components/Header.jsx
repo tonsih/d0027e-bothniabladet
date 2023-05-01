@@ -2,6 +2,9 @@ import { useLazyQuery } from '@apollo/client';
 import { memo, useEffect } from 'react';
 import {
 	FaCamera,
+	FaCog,
+	FaHome,
+	FaImage,
 	FaShoppingCart,
 	FaSignInAlt,
 	FaSignOutAlt,
@@ -16,6 +19,14 @@ import AdminButton from './AdminButton';
 import CategoriesButton from './CategoriesButton';
 import MenuButton from './MenuButton';
 import UserMenu from './UserMenu';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import { LinkContainer } from 'react-router-bootstrap';
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -51,68 +62,165 @@ const Header = () => {
 		}
 	}, [user, dispatch, logout]);
 
-	const UserLinks = memo(() => {
+	const HeaderAlt = memo(() => {
 		if (isLoading) return null;
 		if (user) return <LoggedInHeader />;
 		return <NotLoggedInHeader />;
 	});
 
+	// const NotLoggedInHeader = () => (
+	// 	<>
+	// 		<li className='nav-item'>
+	// 			<Link to='/login' className='nav-link'>
+	// 				<MenuButton startIcon={<FaSignInAlt />}>Login</MenuButton>
+	// 			</Link>
+	// 		</li>
+	// 		<li className='nav-item'>
+	// 			<Link to='/register' className='nav-link'>
+	// 				<MenuButton startIcon={<FaUser />}>Register</MenuButton>
+	// 			</Link>
+	// 		</li>
+	// 	</>
+	// );
+
 	const NotLoggedInHeader = () => (
 		<>
-			<li className='nav-item'>
-				<Link to='/login' className='nav-link'>
-					<MenuButton startIcon={<FaSignInAlt />}>Login</MenuButton>
-				</Link>
-			</li>
-			<li className='nav-item'>
-				<Link to='/register' className='nav-link'>
-					<MenuButton startIcon={<FaUser />}>Register</MenuButton>
-				</Link>
-			</li>
+			<LinkContainer to='/login'>
+				<Nav.Link>
+					{/* <MenuButton startIcon={<FaSignInAlt />}>Login</MenuButton> */}
+					<FaSignInAlt />
+					Login
+				</Nav.Link>
+			</LinkContainer>
+			<LinkContainer to='/register'>
+				<Nav.Link>
+					{/* <MenuButton startIcon={<FaUser />}>Register</MenuButton> */}
+					<FaUser />
+					Register
+				</Nav.Link>
+			</LinkContainer>
 		</>
 	);
 
 	const LoggedInHeader = props => (
 		<>
-			{user?.me?.admin && (
-				<li className='nav-item'>
-					<AdminButton />
-				</li>
-			)}
+			{/* <UserMenu email={user?.me?.email} /> */}
+			<UserDropdown />
+			{user?.me?.admin && <AdminNavItem />}
 			{data && (
-				<Link to='/cart'>
-					<li className='nav-item'>
-						<MenuButton startIcon={<FaShoppingCart />}>
-							{data.shopping_cart_images_by_sc_id.length}
-						</MenuButton>
-					</li>
-				</Link>
+				<LinkContainer to='/cart'>
+					<Nav.Link>
+						{/* <MenuButton startIcon={<FaShoppingCart />}> */}
+						<FaShoppingCart />
+						{data.shopping_cart_images_by_sc_id.length}
+						{/* </MenuButton> */}
+					</Nav.Link>
+				</LinkContainer>
 			)}
-			<li className='nav-item'>
-				<UserMenu email={user?.me?.email} />
-			</li>
 		</>
 	);
 
+	const UserDropdown = () => {
+		const { email } = user?.me;
+
+		return (
+			<NavDropdown
+				title={<span>{email}</span>}
+				id={`offcanvasNavbarDropdown-expand-lg`}
+			>
+				<LinkContainer to='/profile'>
+					<NavDropdown.Item>Profile</NavDropdown.Item>
+				</LinkContainer>
+				<LinkContainer to='/order-history'>
+					<NavDropdown.Item>Order History</NavDropdown.Item>
+				</LinkContainer>
+				<LinkContainer
+					to='/'
+					onClick={async () => {
+						dispatch(logout());
+						dispatch(reset());
+					}}
+				>
+					<NavDropdown.Item>Log out</NavDropdown.Item>
+				</LinkContainer>
+			</NavDropdown>
+		);
+	};
+
+	const AdminNavItem = () => {
+		return (
+			<NavDropdown
+				title={
+					<span className='admin-panel-title'>
+						<FaCog /> AdminPanel
+					</span>
+				}
+				id={`offcanvasNavbarDropdown-expand-lg`}
+			>
+				<LinkContainer to='/admin/users'>
+					<NavDropdown.Item>Users</NavDropdown.Item>
+				</LinkContainer>
+				<LinkContainer to='/admin/images'>
+					<NavDropdown.Item>Images</NavDropdown.Item>
+				</LinkContainer>
+				<LinkContainer to='/admin/image-requests'>
+					<NavDropdown.Item>Requested Images</NavDropdown.Item>
+				</LinkContainer>
+			</NavDropdown>
+		);
+	};
+
 	return (
-		<header className='header'>
-			<nav className='navbar navbar-dark'>
-				<div className='container'>
-					<Link to='/' className='navbar-brand'>
-						<div className='d-flex align-items-center'>
-							<FaCamera className='pr-3' />
-							<div className='logo-text'>BothniaBladet</div>
+		<>
+			<Navbar
+				key='lg'
+				bg='dark'
+				variant='dark'
+				expand='xl'
+				className='mb-3'
+				id='navbar'
+				collapseOnSelect
+			>
+				<Container>
+					<LinkContainer to='/'>
+						<div className='logo-container'>
+							<Navbar.Brand href='#'>
+								<FaCamera className='pr-3' />
+								<span>BothniaBladet</span>
+							</Navbar.Brand>
 						</div>
-					</Link>
-					<ul className='nav navbar-nav ml-auto d-flex flex-row align-items-center justify-content-between'>
-						<li className='nav-item'>
+					</LinkContainer>
+					<Navbar.Toggle aria-controls={`responsive-navbar-nav`} />
+					<Navbar.Collapse id={`responsive-navbar-nav`}>
+						{/* <Nav className='justify-content-end flex-grow-1 pe-3'> */}
+						<Nav className='justify-content-end flex-grow-1'>
+							<LinkContainer to='/'>
+								<Nav.Link>
+									<FaHome />
+									Home
+								</Nav.Link>
+							</LinkContainer>
 							<CategoriesButton />
-						</li>
-						<UserLinks />
-					</ul>
-				</div>
-			</nav>
-		</header>
+							<HeaderAlt />
+							{/* {!user?.me?.admin && (
+								<LinkContainer to='/image-request'>
+									<Nav.Link>
+										<FaImage />
+										Image Request
+									</Nav.Link>
+								</LinkContainer>
+							)} */}
+							<LinkContainer to='/image-request'>
+								<Nav.Link>
+									<FaImage />
+									Image Request
+								</Nav.Link>
+							</LinkContainer>
+						</Nav>
+					</Navbar.Collapse>
+				</Container>
+			</Navbar>
+		</>
 	);
 };
 export default Header;
