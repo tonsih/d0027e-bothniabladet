@@ -32,6 +32,7 @@ const typePolicies = {
 			'image_tags',
 			'shopping_cart_images_by_sc_id',
 			'images_by_tag_name',
+			'requested_images',
 		].reduce((accumulator, fieldName) => {
 			accumulator[fieldName] = {
 				merge(existing, incoming) {

@@ -237,7 +237,7 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 											));
 										}
 
-										const refetchQueries = oldTags.map(tagName => ({
+										const refetchQueries = Array.from(oldTags).map(tagName => ({
 											query: GET_IMAGES_BY_TAG_NAME,
 											variables: {
 												tag_name: tagName,

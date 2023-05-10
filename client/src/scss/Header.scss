@@ -2,49 +2,76 @@ $gap: 0.2rem;
 
 #navbar {
 	background-color: #171a1d !important;
-}
 
-.nav-link {
-	display: flex !important;
-	align-items: center !important;
-	gap: $gap !important;
-	padding: 0.5em 1em !important;
+	&.uncollapsed {
+		.nav-link {
+			display: flex !important;
+			align-items: center !important;
+			gap: $gap !important;
+			padding: 0.5em 1em !important;
 
-	&:hover {
-		background-color: #202429;
-		border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
-		transition: none !important;
-	}
+			&:hover {
+				background-color: #202429;
+				border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
+				transition: none !important;
+			}
 
-	&.active {
-		border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
-		background-color: #202429;
-	}
+			&.active {
+				border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
+				background-color: #202429;
+			}
 
-	.admin-panel-title {
-		display: flex !important;
-		align-items: center;
-		gap: $gap !important;
-	}
-}
-
-.navbar-brand {
-	display: flex;
-	align-items: center;
-	gap: $gap;
-	margin-left: 1em;
-}
-
-.dropdown-menu {
-	background-color: #171a1d !important;
-
-	.dropdown-item {
-		&.active {
-			background-color: #202429;
+			.admin-panel-title {
+				display: flex !important;
+				align-items: center;
+				gap: $gap !important;
+			}
 		}
+	}
 
-		&:active {
-			background-color: #30363d;
+	&.collapsed {
+		.nav-link {
+			display: flex !important;
+			align-items: center !important;
+			gap: $gap !important;
+			padding: 0.5em 1em !important;
+
+			&:hover {
+				// background-color: #202429;
+				// border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
+				transition: none !important;
+			}
+
+			&.active {
+				// border-bottom: 2px rgba(255, 255, 255, 0.205) solid !important;
+			}
+
+			.admin-panel-title {
+				display: flex !important;
+				align-items: center;
+				gap: $gap !important;
+			}
+		}
+	}
+
+	.navbar-brand {
+		display: flex;
+		align-items: center;
+		gap: $gap;
+		margin-left: 1em;
+	}
+
+	.dropdown-menu {
+		background-color: #171a1d !important;
+
+		.dropdown-item {
+			&.active {
+				background-color: #202429;
+			}
+
+			&:active {
+				background-color: #30363d;
+			}
 		}
 	}
 }

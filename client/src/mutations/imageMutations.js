@@ -55,15 +55,6 @@ const ADD_IMAGE = gql`
 	}
 `;
 
-// addRequestedImage: {
-// 			type: RequestedImageType,
-// 			args: {
-// 				title: { type: GraphQLString },
-// 				email: { type: GraphQLNonNull(GraphQLString) },
-// 				journalist: { type: GraphQLString },
-// 				image_file: { type: GraphQLUpload },
-// 				description: { type: GraphQLString },
-
 const ADD_REQUESTED_IMAGE = gql`
 	mutation addRequestedImage(
 		$title: String

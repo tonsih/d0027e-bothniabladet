@@ -1,18 +1,15 @@
-import { Button, Checkbox, TextField, ThemeProvider } from '@mui/material';
-import { theme } from '../style/themes';
+import { useMutation } from '@apollo/client';
+import { Button, TextField, ThemeProvider } from '@mui/material';
 import { Form, Formik, useField } from 'formik';
-import * as yup from 'yup';
-import { useSelector } from 'react-redux';
-import { useLazyQuery, useMutation } from '@apollo/client';
-import { USERS_QUERY, USER_QUERY } from '../queries/userQueries';
-import { useEffect, useState } from 'react';
-import { FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { UPDATE_USER } from '../mutations/userMutations';
-import _ from 'lodash';
+import { useState } from 'react';
 import Dropzone from 'react-dropzone';
+import { FaTrash } from 'react-icons/fa';
+import * as yup from 'yup';
 import ActionButton from '../components/ActionButton';
 import { ADD_REQUESTED_IMAGE } from '../mutations/imageMutations';
 import { GET_REQUESTED_IMAGES } from '../queries/imageQueries';
+import { theme } from '../style/themes';
+import '../scss/ImageRequest.scss';
 
 const MyTextField = ({
 	placeholder,

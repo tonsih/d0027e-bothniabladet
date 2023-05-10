@@ -27,6 +27,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useMediaQuery } from '@mui/material';
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -37,6 +38,8 @@ const Header = () => {
 	const [getScImgs, { data, loading }] = useLazyQuery(
 		USER_SHOPPING_CART_IMAGES
 	);
+
+	const isXlScreenOrSmaller = useMediaQuery('(max-width:1199px)');
 
 	useEffect(() => {
 		if (user?.shopping_cart)
@@ -177,7 +180,7 @@ const Header = () => {
 				bg='dark'
 				variant='dark'
 				expand='xl'
-				className='mb-3'
+				className={`mb-3 ${isXlScreenOrSmaller ? 'collapsed' : 'uncollapsed'}`}
 				id='navbar'
 				collapseOnSelect
 			>

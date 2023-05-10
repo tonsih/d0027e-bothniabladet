@@ -3,9 +3,9 @@ import { GET_REQUESTED_IMAGES } from '../queries/imageQueries';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import SearchFieldWithImages from '../components/SearchFieldWithImages';
-import AdminImageCards from '../components/AdminImageCards';
-import AdminImageRows from '../components/AdminImageRows';
 import AdminImageRequestRows from '../components/AdminImageRequestRows';
+import AdminImageRequestCards from '../components/AdminImageRequestCards';
+import '../scss/AdminImages.scss';
 
 const AdminImageRequests = () => {
 	const { data: reqImgsData } = useQuery(GET_REQUESTED_IMAGES);
@@ -36,7 +36,7 @@ const AdminImageRequests = () => {
 				requestedImages && (
 					<SearchFieldWithImages
 						images={requestedImages}
-						ImagesComponent={AdminImageCards}
+						ImagesComponent={AdminImageRequestCards}
 						id='admin-image-search-field-992px'
 					/>
 				)

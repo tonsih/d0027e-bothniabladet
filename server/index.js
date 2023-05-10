@@ -17,6 +17,10 @@ const app = express();
 db.sync({ force: false, alter: true });
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(
+	'/images/requested',
+	express.static(path.join(__dirname, 'images', 'requested'))
+);
 
 app.use(
 	cors({

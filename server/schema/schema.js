@@ -29,21 +29,32 @@ const {
 	shopping_cart_image,
 	version,
 } = models;
-const { createWriteStream, unlinkSync, existsSync, unlink } = require('fs');
+const {
+	createWriteStream,
+	unlinkSync,
+	existsSync,
+	unlink,
+	readFile,
+	createReadStream,
+} = require('fs');
 const sizeOf = require('image-size');
 const exifr = require('exifr');
 const mime = require('mime-types');
 const moment = require('moment-timezone');
 const { DateTime } = require('luxon');
+const FileType = require('file-type');
 
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const { Op } = require('sequelize');
+const { promisify } = require('util');
 require('dotenv').config();
 
 const throwErrorWithMessage = (message = 'Something went wrong') => {
 	throw new Error(message);
 };
+
+const readFileAsync = promisify(readFile);
 
 const UserType = new GraphQLObjectType({
 	name: 'User',
@@ -103,6 +114,15 @@ const ImageType = new GraphQLObjectType({
 		journalist: { type: GraphQLString },
 		distributable: { type: GraphQLBoolean },
 		deleted: { type: GraphQLBoolean },
+	}),
+});
+
+const RequestedImageFileType = new GraphQLObjectType({
+	name: 'RequestedImageFile',
+	fields: () => ({
+		filename: { type: GraphQLString },
+		data: { type: GraphQLString },
+		mime_type: { type: GraphQLString },
 	}),
 });
 
@@ -335,6 +355,38 @@ const RootQuery = new GraphQLObjectType({
 			args: { image_id: { type: GraphQLID } },
 			async resolve(_, args) {
 				return await image.findByPk(args.image_id);
+			},
+		},
+		requested_image_file: {
+			type: RequestedImageFileType,
+			args: {
+				requested_image_id: { type: GraphQLNonNull(GraphQLID) },
+			},
+			async resolve(_, { requested_image_id }) {
+				try {
+					const { image_url } = await requested_image.findByPk(
+						requested_image_id
+					);
+
+					if (image_url) {
+						const filePath = path.join(
+							__dirname,
+							'..',
+							'/images/requested',
+							image_url
+						);
+						const data = await readFileAsync(filePath);
+						const base64Data = data.toString('base64');
+						const stream = createReadStream(filePath);
+						const mime_type =
+							(await FileType.fromStream(stream))?.mime ||
+							mime.lookup(image_url);
+
+						return { filename: image_url, data: base64Data, mime_type };
+					}
+				} catch (error) {
+					throwErrorWithMessage();
+				}
 			},
 		},
 		all_versions_image: {

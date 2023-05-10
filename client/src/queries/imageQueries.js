@@ -16,6 +16,16 @@ const GET_IMAGES = gql`
 	}
 `;
 
+const GET_REQUESTED_IMAGE_FILE = gql`
+	query requested_image_file($requested_image_id: ID!) {
+		requested_image_file(requested_image_id: $requested_image_id) {
+			filename
+			data
+			mime_type
+		}
+	}
+`;
+
 const GET_REQUESTED_IMAGES = gql`
 	query requested_images {
 		requested_images {
@@ -173,6 +183,7 @@ const GET_TECHNICAL_METADATA = gql`
 export {
 	GET_IMAGES,
 	GET_LATEST_VERSION_IMAGES,
+	GET_REQUESTED_IMAGE_FILE,
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
 	GET_IMAGE_TAGS_BY_IMAGE_ID,

@@ -4,12 +4,10 @@ import exifr from 'exifr';
 import { Form, Formik, useField } from 'formik';
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
-import React, { useMemo, useState } from 'react';
-import { Badge } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Dropzone from 'react-dropzone';
-import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaTrash } from 'react-icons/fa';
 import * as yup from 'yup';
 import {
 	ADD_IMAGE,
@@ -21,12 +19,21 @@ import {
 	GET_IMAGE_TAGS,
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
-	GET_VERSION,
+	GET_REQUESTED_IMAGE_FILE,
 } from '../queries/imageQueries';
 import '../scss/AddImageModal.scss';
+import '../scss/TextField.scss';
 import { theme } from '../style/themes';
 import ActionButton from './ActionButton';
-import '../scss/TextField.scss';
+
+const base64toFile = (base64Data, fileName, mimeType) => {
+	const byteString = atob(base64Data);
+	const bytes = new Uint8Array(byteString.length);
+	for (let i = 0; i < byteString.length; i++) {
+		bytes[i] = byteString.charCodeAt(i);
+	}
+	return new File([bytes], fileName, { type: mimeType });
+};
 
 const MyTextField = ({
 	placeholder,
@@ -92,12 +99,28 @@ const MyTagTextField = ({
 	);
 };
 
-const AddImageModal = ({ adminImageCard, id }) => {
+const AddImageModal = ({
+	adminImageCard,
+	id,
+	ButtonInnerComponent = () => <h6 className='p-0 m-0'>Add Image</h6>,
+	image: img = null,
+}) => {
 	const uploadFileMutation = gql`
 		mutation ($file: Upload!) {
 			uploadFile(file: $file)
 		}
 	`;
+
+	const {
+		requested_image_id: reqImgId,
+		image_id: imgId,
+		title: imgTitle,
+		price: imgPrice,
+		description: imgDescription,
+		uses: imgUses,
+		journalist: imgJournalist,
+		image_url: imgUrl,
+	} = img || {};
 
 	const [uploadFile] = useMutation(uploadFileMutation);
 
@@ -108,6 +131,10 @@ const AddImageModal = ({ adminImageCard, id }) => {
 
 	const [getITBIData, { refetch: refetchITBI }] = useLazyQuery(
 		GET_IMAGE_TAGS_BY_IMAGE_ID
+	);
+
+	const [getReqImgFileData, { data: reqImgFileData }] = useLazyQuery(
+		GET_REQUESTED_IMAGE_FILE
 	);
 
 	const [createImageTag, { data: itData }] = useMutation(CREATE_IMAGE_TAG);
@@ -141,6 +168,8 @@ const AddImageModal = ({ adminImageCard, id }) => {
 	};
 	const handleShow = () => setShow(true);
 
+	const [requestedImage, setRequestedImage] = useState(null);
+
 	const [image, setImage] = useState(null);
 	const [thumbnail, setThumbnail] = useState(null);
 
@@ -160,6 +189,36 @@ const AddImageModal = ({ adminImageCard, id }) => {
 		journalist: yup.string().max(255),
 	});
 
+	useEffect(() => {
+		if (reqImgId) {
+			getReqImgFileData({
+				variables: { requested_image_id: reqImgId },
+			});
+		}
+	}, [reqImgId]);
+
+	useEffect(() => {
+		if (reqImgFileData?.requested_image_file?.data && show) {
+			console.log(reqImgFileData?.requested_image_file?.data);
+			const {
+				data,
+				mime_type: mimeType,
+				filename,
+			} = reqImgFileData?.requested_image_file;
+
+			const file = base64toFile(
+				reqImgFileData?.requested_image_file?.data,
+				filename,
+				mimeType
+			);
+			setRequestedImage(file);
+		}
+	}, [reqImgFileData, show]);
+
+	if (requestedImage) {
+		console.log(requestedImage);
+	}
+
 	return (
 		<>
 			<ActionButton
@@ -170,7 +229,7 @@ const AddImageModal = ({ adminImageCard, id }) => {
 				startIcon={adminImageCard && <FaPlus />}
 				id={id}
 			>
-				<h6 className='p-0 m-0'>Add Image</h6>
+				<ButtonInnerComponent />
 			</ActionButton>
 
 			<Modal show={show} onHide={handleClose}>
@@ -182,11 +241,11 @@ const AddImageModal = ({ adminImageCard, id }) => {
 						<Formik
 							validationSchema={schema}
 							initialValues={{
-								title: '',
-								price: '',
-								description: '',
-								uses: 1,
-								journalist: '',
+								title: imgTitle || '',
+								price: imgPrice || '',
+								description: imgDescription || '',
+								uses: imgUses || 1,
+								journalist: imgJournalist || '',
 							}}
 							onSubmit={async (data, { setSubmitting }) => {
 								setSubmitting(true);
@@ -195,16 +254,19 @@ const AddImageModal = ({ adminImageCard, id }) => {
 								if (title && price) {
 									let GPSLatitude, GPSLongitude, Model;
 
-									if (image) {
+									if (image || requestedImage) {
 										({ GPSLatitude, GPSLongitude, Model } = await exifr.parse(
-											image,
+											image || requestedImage,
 											true
 										));
 									}
 
 									try {
-										const imageModifiedDate = image?.lastModified
-											? DateTime.fromMillis(image.lastModified)
+										const imageModifiedDate = (image || requestedImage)
+											?.lastModified
+											? DateTime.fromMillis(
+													(image || requestedImage).lastModified
+											  )
 													.setZone('Europe/Stockholm')
 													.toJSDate()
 													.toLocaleString('en-US', {
@@ -235,12 +297,12 @@ const AddImageModal = ({ adminImageCard, id }) => {
 														? `${GPSLatitude}, ${GPSLongitude}`
 														: null,
 												camera_type: Model,
-												image_file: image || null,
-												format: image?.type || null,
-												last_modified: image?.lastModified
+												image_file: image || requestedImage || null,
+												format: (image || requestedImage)?.type || null,
+												last_modified: (image || requestedImage)?.lastModified
 													? isoModifiedDateString
 													: null,
-												size: image?.size || null,
+												size: (image || requestedImage)?.size || null,
 											},
 											// refetchQueries: [
 											// 	{
@@ -248,19 +310,22 @@ const AddImageModal = ({ adminImageCard, id }) => {
 											// 	},
 											// ],
 											update(cache, { data: { addImage } }) {
-												const { latest_version_images } = cache.readQuery({
-													query: GET_LATEST_VERSION_IMAGES,
-												});
+												const { latest_version_images } =
+													cache.readQuery({
+														query: GET_LATEST_VERSION_IMAGES,
+													}) || {};
 
-												cache.writeQuery({
-													query: GET_LATEST_VERSION_IMAGES,
-													data: {
-														latest_version_images: [
-															...latest_version_images,
-															addImage,
-														],
-													},
-												});
+												if (latest_version_images) {
+													cache.writeQuery({
+														query: GET_LATEST_VERSION_IMAGES,
+														data: {
+															latest_version_images: [
+																...latest_version_images,
+																addImage,
+															],
+														},
+													});
+												}
 											},
 										});
 
@@ -521,6 +586,19 @@ const AddImageModal = ({ adminImageCard, id }) => {
 												</div>
 											</div>
 										</>
+									)}
+
+									{imgUrl && (
+										<div className='current-img'>
+											<div className='image-preview p-2'>
+												<span>Current Image</span>
+												<img
+													src={imgUrl}
+													className='current-img-thumbnail img-thumbnail'
+													alt='Current image thumbnail'
+												/>
+											</div>
+										</div>
 									)}
 									<Modal.Footer>
 										<ActionButton

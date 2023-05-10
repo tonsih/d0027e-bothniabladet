@@ -20,6 +20,84 @@ import {
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 
+export const handleDeleteButtonClick = async (
+	imgTagNames,
+	user,
+	image_id,
+	deleteImage
+) => {
+	try {
+		const refetchQueries = imgTagNames.map(tagName => ({
+			query: GET_IMAGES_BY_TAG_NAME,
+			variables: {
+				tag_name: tagName,
+			},
+		}));
+
+		await deleteImage({
+			variables: {
+				image_id,
+			},
+			refetchQueries: [
+				{
+					query: USER_SHOPPING_CART,
+					variables: {
+						user_id: user?.me?.user_id,
+					},
+				},
+				...refetchQueries,
+			],
+			update(cache, { data: { deleteImage } }) {
+				const { latest_version_images } = cache.readQuery({
+					query: GET_LATEST_VERSION_IMAGES,
+				});
+
+				cache.writeQuery({
+					query: GET_LATEST_VERSION_IMAGES,
+					data: {
+						latest_version_images: latest_version_images.filter(
+							verImage => verImage.image.image_id !== image_id
+						),
+					},
+				});
+
+				const { image_tags } = cache.readQuery({
+					query: GET_IMAGE_TAGS,
+				});
+				cache.writeQuery({
+					query: GET_IMAGE_TAGS,
+					data: {
+						image_tags: image_tags.filter(
+							imgTag => imgTag.image.image_id !== image_id
+						),
+					},
+				});
+
+				const { shopping_cart_images_by_sc_id: scImgs } = cache.readQuery({
+					query: USER_SHOPPING_CART_IMAGES,
+					variables: {
+						shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
+					},
+				});
+
+				cache.writeQuery({
+					query: USER_SHOPPING_CART_IMAGES,
+					variables: {
+						shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
+					},
+					data: {
+						shopping_cart_images_by_sc_id: scImgs.filter(
+							scImg => scImg.image.image_id !== image_id
+						),
+					},
+				});
+			},
+		});
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 const AdminImageRow = ({ image }) => {
 	const {
 		image_id,
@@ -121,80 +199,9 @@ const AdminImageRow = ({ image }) => {
 						id='delete-image-button'
 						variant='outlined'
 						color='secondary'
-						onClick={async () => {
-							try {
-								const refetchQueries = imgTagNames.map(tagName => ({
-									query: GET_IMAGES_BY_TAG_NAME,
-									variables: {
-										tag_name: tagName,
-									},
-								}));
-
-								await deleteImage({
-									variables: {
-										image_id,
-									},
-									refetchQueries: [
-										{
-											query: USER_SHOPPING_CART,
-											variables: {
-												user_id: user?.me?.user_id,
-											},
-										},
-										...refetchQueries,
-									],
-									update(cache, { data: { deleteImage } }) {
-										const { latest_version_images } = cache.readQuery({
-											query: GET_LATEST_VERSION_IMAGES,
-										});
-
-										cache.writeQuery({
-											query: GET_LATEST_VERSION_IMAGES,
-											data: {
-												latest_version_images: latest_version_images.filter(
-													verImage => verImage.image.image_id !== image_id
-												),
-											},
-										});
-
-										const { image_tags } = cache.readQuery({
-											query: GET_IMAGE_TAGS,
-										});
-										cache.writeQuery({
-											query: GET_IMAGE_TAGS,
-											data: {
-												image_tags: image_tags.filter(
-													imgTag => imgTag.image.image_id !== image_id
-												),
-											},
-										});
-
-										const { shopping_cart_images_by_sc_id: scImgs } =
-											cache.readQuery({
-												query: USER_SHOPPING_CART_IMAGES,
-												variables: {
-													shopping_cart_id:
-														user?.shopping_cart?.shopping_cart_id,
-												},
-											});
-
-										cache.writeQuery({
-											query: USER_SHOPPING_CART_IMAGES,
-											variables: {
-												shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
-											},
-											data: {
-												shopping_cart_images_by_sc_id: scImgs.filter(
-													scImg => scImg.image.image_id !== image_id
-												),
-											},
-										});
-									},
-								});
-							} catch (error) {
-								console.log(error);
-							}
-						}}
+						onClick={() =>
+							handleDeleteButtonClick(imgTagNames, user, image_id, deleteImage)
+						}
 					>
 						<h6 className='p-0 m-0'>
 							<FaTrash />

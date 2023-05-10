@@ -26,6 +26,7 @@ import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import { StyledLink } from '../style/styledComponents/StyledLink';
 import '../scss/AdminImageCard.scss';
+import { handleDeleteButtonClick } from './AdminImageRow';
 
 const AdminImageCard = ({ image }) => {
 	const {
@@ -146,80 +147,9 @@ const AdminImageCard = ({ image }) => {
 						color='secondary'
 						className='btn w-100 p-3'
 						startIcon={<FaTrash />}
-						onClick={async () => {
-							try {
-								const refetchQueries = imgTagNames.map(tagName => ({
-									query: GET_IMAGES_BY_TAG_NAME,
-									variables: {
-										tag_name: tagName,
-									},
-								}));
-
-								await deleteImage({
-									variables: {
-										image_id,
-									},
-									refetchQueries: [
-										{
-											query: USER_SHOPPING_CART,
-											variables: {
-												user_id: user?.me?.user_id,
-											},
-										},
-										...refetchQueries,
-									],
-									update(cache, { data: { deleteImage } }) {
-										const { latest_version_images } = cache.readQuery({
-											query: GET_LATEST_VERSION_IMAGES,
-										});
-
-										cache.writeQuery({
-											query: GET_LATEST_VERSION_IMAGES,
-											data: {
-												latest_version_images: latest_version_images.filter(
-													verImage => verImage.image.image_id !== image_id
-												),
-											},
-										});
-
-										const { image_tags } = cache.readQuery({
-											query: GET_IMAGE_TAGS,
-										});
-										cache.writeQuery({
-											query: GET_IMAGE_TAGS,
-											data: {
-												image_tags: image_tags.filter(
-													imgTag => imgTag.image.image_id !== image_id
-												),
-											},
-										});
-
-										const { shopping_cart_images_by_sc_id: scImgs } =
-											cache.readQuery({
-												query: USER_SHOPPING_CART_IMAGES,
-												variables: {
-													shopping_cart_id:
-														user?.shopping_cart?.shopping_cart_id,
-												},
-											});
-
-										cache.writeQuery({
-											query: USER_SHOPPING_CART_IMAGES,
-											variables: {
-												shopping_cart_id: user?.shopping_cart?.shopping_cart_id,
-											},
-											data: {
-												shopping_cart_images_by_sc_id: scImgs.filter(
-													scImg => scImg.image.image_id !== image_id
-												),
-											},
-										});
-									},
-								});
-							} catch (error) {
-								console.log(error);
-							}
-						}}
+						onClick={() =>
+							handleDeleteButtonClick(imgTagNames, user, image_id, deleteImage)
+						}
 					>
 						Delete image
 					</ActionButton>
