@@ -47,7 +47,7 @@ const ShoppingCartImageRow = ({ image, userId }) => {
 				<td className='w-25'>
 					<img
 						className='w-75'
-						src={image_url || 'https://placehold.co/500x400'}
+						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 					/>
 				</td>
 				<td>{title}</td>
@@ -66,9 +66,9 @@ const ShoppingCartImageRow = ({ image, userId }) => {
 								console.log(error);
 							}
 						}}
-						variant='contained'
+						variant='outlined'
 						color='secondary'
-						className='btn'
+						className='btn delete-image-button'
 					>
 						<h6 className='p-0 m-0'>
 							<FaTrash />

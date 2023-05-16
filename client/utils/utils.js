@@ -9,4 +9,8 @@ const getNowDateISOString = () => {
 	return (isoString = isoOrderDate.toISOString());
 };
 
-export { getNowDateISOString };
+const isRequiredString = requiredFieldName => {
+	return `${requiredFieldName} is a required field`;
+};
+
+export { getNowDateISOString, isRequiredString };

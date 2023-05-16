@@ -117,7 +117,10 @@ const ImagePage = () => {
 							<div className='col-md-6 col-sm-12'>
 								<img
 									className='card-img'
-									src={data.image.image_url || 'https://placehold.co/500x400'}
+									src={
+										data.image.image_url ||
+										'https://placehold.co/500x400?text=No+Image'
+									}
 									alt=''
 								/>
 							</div>

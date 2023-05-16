@@ -878,19 +878,40 @@ const mutation = new GraphQLObjectType({
 							createWriteStream(imgPath)
 						);
 
-						stream.on('finish', async () => {
-							if (tm) {
-								sizeOf(imgPath, async (err, { width, height }) => {
-									await tm.update({
-										width,
-										height,
-									});
-								});
-							}
+						// stream.on('finish', async () => {
+						// 	if (tm) {
+						// 		sizeOf(imgPath, async (err, { width, height }) => {
+						// 			await tm.update({
+						// 				width,
+						// 				height,
+						// 			});
+						// 		});
+						// 	}
 
-							await img.update({
-								image_url: filename,
+						// 	await img.update({
+						// 		image_url: filename,
+						// 	});
+						// });
+
+						await new Promise((resolve, reject) => {
+							stream.on('finish', async () => {
+								if (tm) {
+									sizeOf(imgPath, async (err, { width, height }) => {
+										await tm.update({
+											width,
+											height,
+										});
+									});
+								}
+
+								await img.update({
+									image_url: filename,
+								});
+
+								resolve(); // Resolve the promise after the image URL is updated
 							});
+
+							stream.on('error', reject);
 						});
 					}
 

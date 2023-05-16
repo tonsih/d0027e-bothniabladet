@@ -1,10 +1,10 @@
 import { useQuery } from '@apollo/client';
-import { GET_REQUESTED_IMAGES } from '../queries/imageQueries';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
-import SearchFieldWithImages from '../components/SearchFieldWithImages';
-import AdminImageRequestRows from '../components/AdminImageRequestRows';
 import AdminImageRequestCards from '../components/AdminImageRequestCards';
+import AdminImageRequestRows from '../components/AdminImageRequestRows';
+import SearchFieldWithImages from '../components/SearchFieldWithImages';
+import { GET_REQUESTED_IMAGES } from '../queries/imageQueries';
 import '../scss/AdminImages.scss';
 
 const AdminImageRequests = () => {
@@ -12,7 +12,6 @@ const AdminImageRequests = () => {
 	const theme = useTheme();
 	const isMdWidth = useMediaQuery(theme.breakpoints.down('md'));
 	const isMax992 = useMediaQuery('(max-width:992px)');
-	console.log(reqImgsData);
 
 	const [requestedImages, setRequestedImages] = useState([]);
 

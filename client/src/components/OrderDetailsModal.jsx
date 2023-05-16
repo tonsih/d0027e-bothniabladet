@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FaInfoCircle } from 'react-icons/fa';
 import { GET_ORDER_IMAGES } from '../queries/orderQueries';
+import '../scss/OrderDetailsModal.scss';
 import ActionButton from './ActionButton';
 import OrderImageRow from './OrderImageRow';
-import '../scss/OrderDetailsModal.scss';
 
 const OrderDetailsModal = ({ order, show, handleClose, handleShow }) => {
 	const [orderImages, setOrderImages] = useState([]);

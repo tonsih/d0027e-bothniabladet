@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import YupPassword from 'yup-password';
 import { login, reset } from '../features/auth/authSlice';
 import { theme } from '../style/themes';
-YupPassword(yup); // extend yup
+YupPassword(yup);
 
 const schema = yup.object({
 	email: yup.string().required().min(0).max(50),

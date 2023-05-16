@@ -61,7 +61,7 @@ const App = () => {
 				<Router>
 					<Provider store={store}>
 						<Header />
-						<main className='container mt-5'>
+						<main className='container mt-3'>
 							<Routes>
 								<Route path='*' element={<NotFound />} />
 								<Route path='/' element={<Home />} />

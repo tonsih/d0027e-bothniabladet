@@ -1,15 +1,10 @@
 import { ThemeProvider } from '@mui/material';
+import _ from 'lodash';
 import { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import {
-	FaCheckCircle,
-	FaCross,
-	FaEye,
-	FaRegTimesCircle,
-} from 'react-icons/fa';
+import { FaCheckCircle, FaEye, FaRegTimesCircle } from 'react-icons/fa';
 import { theme } from '../style/themes';
 import ActionButton from './ActionButton';
-import _ from 'lodash';
 
 const VersionDetailsModal = ({ image }) => {
 	const {
@@ -49,7 +44,8 @@ const VersionDetailsModal = ({ image }) => {
 	return (
 		<>
 			<ActionButton
-				variant='contained'
+				variant='outlined'
+				color='primary'
 				className='btn p-2'
 				onClick={handleShow}
 			>

@@ -1,11 +1,10 @@
 import { useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ImageCard from '../components/ImageCard';
+import Images from '../components/Images';
+import SearchFieldWithImages from '../components/SearchFieldWithImages';
 import Spinner from '../components/Spinner';
 import { GET_IMAGES_BY_TAG_NAME } from '../queries/imageQueries';
-import SearchFieldWithImages from '../components/SearchFieldWithImages';
-import { useEffect, useState } from 'react';
-import Images from '../components/Images';
 
 const CategoryPage = () => {
 	const { category: tagName } = useParams();
@@ -36,9 +35,9 @@ const CategoryPage = () => {
 
 	return (
 		<>
-			<span className='category-title'>
+			<div className='category-title mb-4'>
 				<h1>Category: {tagName}</h1>
-			</span>
+			</div>
 			<SearchFieldWithImages images={images} ImagesComponent={Images} />
 		</>
 	);

@@ -1,0 +1,40 @@
+#add-image-button {
+	&-992px {
+		margin-bottom: 1.5em;
+	}
+}
+
+.ban-button,
+.delete-image-button,
+.delete-user-button {
+	color: white !important;
+	background-color: rgb(134, 39, 30) !important;
+	border-color: rgb(134, 39, 30) !important;
+
+	&:hover {
+		background-color: #47150f !important;
+		border-color: #c0392b !important;
+	}
+}
+
+.form-button {
+	margin-right: 5px !important;
+	text-transform: none !important;
+}
+
+.close-modal-button {
+	background-color: #353f49 !important;
+	border-color: #353f49 !important;
+	text-transform: none !important;
+
+	&:hover {
+		background-color: #21292e !important;
+		border-color: #2980b9 !important;
+	}
+}
+
+.order-button {
+	max-width: 100px;
+	padding: 0.5em !important;
+	margin-top: 25px !important;
+}

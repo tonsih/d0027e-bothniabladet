@@ -10,29 +10,6 @@
 	}
 }
 
-#add-image-button {
-	&-992px {
-		margin-bottom: 1.5em;
-	}
-}
-
-#delete-image-button {
-	background-color: rgb(134, 39, 30);
-	border-color: rgb(134, 39, 30);
-
-	&.admin-image-row {
-		&:hover {
-			background-color: #47150f;
-			border-color: #c0392b;
-		}
-	}
-
-	&:hover {
-		background-color: #211e20;
-		border-color: #c0392b;
-	}
-}
-
 .dropzone-field {
 	border: 1px solid;
 	border-style: dashed;
@@ -64,4 +41,10 @@
 			}
 		}
 	}
+}
+
+.search-field {
+	display: flex !important;
+	max-width: 23em;
+	margin-top: 20px !important;
 }

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -64,6 +65,10 @@ const MetadataModal = ({ metadata, image, adminImageCard = false }) => {
 								value = new Date(value).toLocaleString('sv-SE', {
 									timeZone: 'Europe/Stockholm',
 								});
+							}
+
+							if (_.isEmpty(value)) {
+								value = '-';
 							}
 
 							return (

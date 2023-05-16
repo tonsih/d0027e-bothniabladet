@@ -1,7 +1,7 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import ImageCard from './ImageCard';
 import { useEffect, useState } from 'react';
 import ComponentSlider from './ComponentSlider';
+import ImageCard from './ImageCard';
 
 const Images = ({ images }) => {
 	const [imgComps, setimgComps] = useState([]);

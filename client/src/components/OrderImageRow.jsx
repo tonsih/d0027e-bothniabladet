@@ -8,7 +8,7 @@ const OrderImageRow = ({ image }) => {
 				<td className='w-25'>
 					<img
 						className='w-75'
-						src={image_url || 'https://placehold.co/500x400'}
+						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 					/>
 				</td>
 				<td>{title}</td>

@@ -1,4 +1,3 @@
-import { FaGithub } from 'react-icons/fa';
 import '../scss/Footer.scss';
 
 const Footer = () => {

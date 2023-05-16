@@ -65,7 +65,7 @@ create table bothniabladet.tag(
 
 create table bothniabladet.technical_metadata(
   technical_metadata_id           serial,
-  coordinates                     varChar(100),                
+  coordinates                     varchar(100),                
   camera_type                     varchar(100),
   format                          varchar(100),
   last_modified                   datetime,

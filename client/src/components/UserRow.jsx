@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import { DELETE_USER, UPDATE_USER } from '../mutations/userMutations';
 import { ME_QUERY, USERS_QUERY } from '../queries/userQueries';
+import ActionButton from './ActionButton';
 
 const UserRow = ({ user: curUser }) => {
 	const { user_id, first_name, last_name, email, admin, banned } = curUser;
@@ -103,8 +104,8 @@ const UserRow = ({ user: curUser }) => {
 								console.log(error);
 							}
 						}}
-						className='btn'
-						variant='contained'
+						className='btn ban-button'
+						variant='outlined'
 						disabled={user_id === meData?.me?.user_id}
 					>
 						<FaBan />
@@ -137,9 +138,9 @@ const UserRow = ({ user: curUser }) => {
 			</td>
 			<td>
 				<>
-					<Button
-						className='btn'
-						variant='contained'
+					<ActionButton
+						className='btn delete-user-button'
+						variant='outlined'
 						color='secondary'
 						disabled={user_id === meData?.me?.user_id}
 						onClick={async () => {
@@ -154,8 +155,10 @@ const UserRow = ({ user: curUser }) => {
 							}
 						}}
 					>
-						<FaTrash />
-					</Button>
+						<h6 className='p-0 m-0'>
+							<FaTrash />
+						</h6>
+					</ActionButton>
 				</>
 			</td>
 		</tr>

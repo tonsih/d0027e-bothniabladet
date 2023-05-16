@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/client';
 import { DELETE_REQUESTED_IMAGE } from '../mutations/imageMutations';
 import AddImageModal from './AddImageModal';
 import { useMediaQuery, useTheme } from '@mui/material';
+import '../scss/Buttons.scss';
 
 const AdminImageRequestRow = ({ requestedImage }) => {
 	const {
@@ -29,7 +30,7 @@ const AdminImageRequestRow = ({ requestedImage }) => {
 				<td className='w-25'>
 					<img
 						className='w-75'
-						src={image_url || 'https://placehold.co/500x400'}
+						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 					/>
 				</td>
 				<td>{title}</td>
@@ -46,10 +47,9 @@ const AdminImageRequestRow = ({ requestedImage }) => {
 				</td>
 				<td>
 					<ActionButton
-						variant='contained'
+						variant='outlined'
 						color='secondary'
-						id='delete-image-button'
-						className='btn'
+						className='btn delete-image-button'
 						onClick={() =>
 							handleDeleteButtonClick(requested_image_id, deleteRequestedImage)
 						}

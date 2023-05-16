@@ -1,24 +1,23 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
 import { FaCheckCircle, FaHistory, FaTrash } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { DELETE_IMAGE } from '../mutations/imageMutations';
 import {
-	GET_IMAGE_TAGS_BY_IMAGE_ID,
+	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
+	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
 	GET_TECHNICAL_METADATA,
-	GET_IMAGES_BY_TAG_NAME,
 } from '../queries/imageQueries';
-import ActionButton from './ActionButton';
-import EditImageModal from './EditImageModal';
-import MetadataModal from './MetadataModal';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import {
 	USER_SHOPPING_CART,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
-import { useEffect, useState } from 'react';
-import _ from 'lodash';
+import ActionButton from './ActionButton';
+import EditImageModal from './EditImageModal';
+import MetadataModal from './MetadataModal';
 
 export const handleDeleteButtonClick = async (
 	imgTagNames,
@@ -164,7 +163,7 @@ const AdminImageRow = ({ image }) => {
 				<td className='w-25'>
 					<img
 						className='w-75'
-						src={image_url || 'https://placehold.co/500x400'}
+						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 					/>
 				</td>
 				<td>{title}</td>
@@ -195,7 +194,7 @@ const AdminImageRow = ({ image }) => {
 				</td>
 				<td>
 					<ActionButton
-						className='btn admin-image-row'
+						className='btn delete-image-button admin-image-row'
 						id='delete-image-button'
 						variant='outlined'
 						color='secondary'

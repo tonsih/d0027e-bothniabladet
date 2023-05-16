@@ -1,0 +1,21 @@
+// #sliderButtonPrevious {
+// 	margin-right: 10px;
+// }
+
+// #sliderButtonNext {
+// 	margin-left: 10px;
+// }
+
+#paginationIndicator {
+	flex-grow: 1;
+}
+
+.component-container {
+	max-width: 410px;
+	.card {
+		img {
+			width: 410px;
+			height: 287px;
+		}
+	}
+}

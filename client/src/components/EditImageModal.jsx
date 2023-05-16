@@ -4,11 +4,10 @@ import exifr from 'exifr';
 import { Form, Formik, useField } from 'formik';
 import _, { isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
-import { Badge } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Dropzone from 'react-dropzone';
-import { FaEdit, FaPlus, FaTimes, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaPlus, FaTrash } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import * as yup from 'yup';
 import {
 	CREATE_IMAGE_TAG,
@@ -21,16 +20,14 @@ import {
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
 } from '../queries/imageQueries';
-import '../scss/AddImageModal.scss';
-import { theme } from '../style/themes';
-import ActionButton from './ActionButton';
 import {
-	SHOPPING_CART_IMAGES,
 	USER_SHOPPING_CART,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
-import { useSelector } from 'react-redux';
+import '../scss/AddImageModal.scss';
 import '../scss/EditImageModal.scss';
+import { theme } from '../style/themes';
+import ActionButton from './ActionButton';
 
 const MyTextField = ({
 	placeholder,
@@ -299,23 +296,23 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 													image_id: new_image_id,
 													name: tagName,
 												},
-												// refetchQueries: [
-												// 	{
-												// 		query: GET_IMAGE_TAGS,
-												// 	},
-												// 	{
-												// 		query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-												// 		variables: {
-												// 			image_id: new_image_id,
-												// 		},
-												// 	},
-												// 	{
-												// 		query: GET_IMAGES_BY_TAG_NAME,
-												// 		variables: {
-												// 			tag_name: tagName,
-												// 		},
-												// 	},
-												// ],
+												refetchQueries: [
+													// {
+													// 	query: GET_IMAGE_TAGS,
+													// },
+													// {
+													// 	query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+													// 	variables: {
+													// 		image_id: new_image_id,
+													// 	},
+													// },
+													{
+														query: GET_IMAGES_BY_TAG_NAME,
+														variables: {
+															tag_name: tagName,
+														},
+													},
+												],
 												update(cache, { data: { createImageTag } }) {
 													const { tag } = createImageTag;
 
@@ -458,6 +455,7 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 														<li key={index} className='tags-list-item'>
 															<Chip
 																label={tag}
+																className='tag-chip'
 																color='primary'
 																onClick={() =>
 																	handleRemoveTag(index, tags, setTags)
@@ -528,16 +526,22 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 									) : (
 										<>
 											<div className='imageUpload'>
-												{image?.name}
-												<ActionButton
-													variant='secondary'
-													onClick={() => {
-														setImage(null);
-														setThumbnail(null);
-													}}
-												>
-													<FaTrash />
-												</ActionButton>
+												<div className='preview-info-container d-flex'>
+													{image?.name}
+													<ActionButton
+														className='btn delete-image-button'
+														id='delete-image-button'
+														variant='outlined'
+														color='secondary'
+														onClick={() => {
+															setImage(null);
+															setThumbnail(null);
+														}}
+													>
+														<FaTrash />
+													</ActionButton>
+												</div>
+
 												<div className='image-preview p-2'>
 													<span>Image preview</span>
 													<img
@@ -564,15 +568,18 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 									)}
 									<Modal.Footer>
 										<ActionButton
+											variant='outlined'
 											color='primary'
 											disabled={isSubmitting}
 											type='submit'
-											className='form-button'
+											className='btn form-button'
 										>
 											Save Changes
 										</ActionButton>
 										<ActionButton
-											className='close-modal-button'
+											className='btn close-modal-button'
+											variant='outlined'
+											color='primary'
 											onClick={handleClose}
 										>
 											Close

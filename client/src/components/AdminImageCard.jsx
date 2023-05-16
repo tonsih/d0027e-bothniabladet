@@ -1,32 +1,23 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
 import {
 	FaCheckCircle,
 	FaHistory,
 	FaTimesCircle,
 	FaTrash,
 } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { DELETE_IMAGE } from '../mutations/imageMutations';
 import {
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
-	GET_IMAGE_TAGS,
-	GET_LATEST_VERSION_IMAGES,
 	GET_TECHNICAL_METADATA,
-	GET_IMAGES_BY_TAG_NAME,
 } from '../queries/imageQueries';
+import '../scss/AdminImageCard.scss';
 import ActionButton from './ActionButton';
+import { handleDeleteButtonClick } from './AdminImageRow';
 import EditImageModal from './EditImageModal';
 import MetadataModal from './MetadataModal';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import {
-	USER_SHOPPING_CART,
-	USER_SHOPPING_CART_IMAGES,
-} from '../queries/shoppingCartQueries';
-import { useEffect, useState } from 'react';
-import _ from 'lodash';
-import { StyledLink } from '../style/styledComponents/StyledLink';
-import '../scss/AdminImageCard.scss';
-import { handleDeleteButtonClick } from './AdminImageRow';
 
 const AdminImageCard = ({ image }) => {
 	const {
@@ -89,12 +80,12 @@ const AdminImageCard = ({ image }) => {
 
 	return (
 		<>
-			<div className='card h-100 mt-3'>
+			<div className='card h-100'>
 				{/* <StyledLink to={`/image/${image_id}`} key={image_id} className='w-100'> */}
 				<img
 					className='card-img-top'
 					alt={image_id}
-					src={image_url || 'https://placehold.co/500x400'}
+					src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 				/>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>
@@ -142,10 +133,9 @@ const AdminImageCard = ({ image }) => {
 
 				<div className='card-body d-flex align-items-end'>
 					<ActionButton
-						id='delete-image-button'
 						variant='outlined'
 						color='secondary'
-						className='btn w-100 p-3'
+						className='btn delete-image-button w-100 p-3'
 						startIcon={<FaTrash />}
 						onClick={() =>
 							handleDeleteButtonClick(imgTagNames, user, image_id, deleteImage)

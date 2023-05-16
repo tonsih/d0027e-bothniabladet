@@ -1,10 +1,11 @@
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
+import { Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import UserRow from '../components/UserRow';
 import { USERS_QUERY } from '../queries/userQueries';
-import { Spinner } from 'react-bootstrap';
+import '../scss/Buttons.scss';
 
 const AdminUsers = () => {
 	const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import { useLazyQuery } from '@apollo/client';
-import { useSelector } from 'react-redux';
-import { GET_USER_ORDERS } from '../queries/orderQueries';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import OrderHistoryRow from '../components/OrderHistoryRow';
+import { GET_USER_ORDERS } from '../queries/orderQueries';
 
 const OrderHistory = () => {
 	const { user, isLoading, isError, isSuccess, message } = useSelector(

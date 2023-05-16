@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
+import '../scss/ImageCard.scss';
 import { StyledLink } from '../style/styledComponents/StyledLink';
 import ActionButton from './ActionButton';
-import '../scss/ImageCard.scss';
 
 const ImageCard = ({ image }) => {
 	const { image_id, title, price, uses, description, image_url } = image;
@@ -19,7 +19,7 @@ const ImageCard = ({ image }) => {
 				<img
 					className='card-img-top'
 					alt={image_id}
-					src={image_url || 'https://placehold.co/500x400'}
+					src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 				/>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>

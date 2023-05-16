@@ -1,17 +1,16 @@
 import { useQuery } from '@apollo/client';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AddImageModal from '../components/AddImageModal';
-import AdminImageRow from '../components/AdminImageRow';
+import AdminImageCards from '../components/AdminImageCards';
+import AdminImageRows from '../components/AdminImageRows';
+import SearchFieldWithImages from '../components/SearchFieldWithImages';
 import Spinner from '../components/Spinner';
 import { GET_LATEST_VERSION_IMAGES } from '../queries/imageQueries';
 import '../scss/AdminImages.scss';
-import { useMediaQuery, useTheme } from '@mui/material';
-import AdminImageCard from '../components/AdminImageCard';
-import SearchFieldWithImages from '../components/SearchFieldWithImages';
-import AdminImageCards from '../components/AdminImageCards';
-import AdminImageRows from '../components/AdminImageRows';
+import '../scss/Buttons.scss';
 
 const AdminImages = () => {
 	const navigate = useNavigate();
@@ -32,8 +31,6 @@ const AdminImages = () => {
 		}
 	}, [data]);
 
-	console.log(images);
-
 	useEffect(() => {
 		if (!user || !user.me || user.me.banned || !user.me.admin) {
 			navigate('/');
@@ -48,7 +45,7 @@ const AdminImages = () => {
 				className={
 					isMax992
 						? 'admin-img-card d-flex flex-column justify-content-center align-items-center'
-						: 'table-responsive'
+						: 'table-responsive mt-3 mb-5'
 				}
 			>
 				<AddImageModal
@@ -65,8 +62,6 @@ const AdminImages = () => {
 					)
 				) : (
 					<>
-						{/* {data?.latest_version_images &&
-								data?.latest_version_images.map(image => {})} */}
 						{images && (
 							<SearchFieldWithImages
 								images={images}

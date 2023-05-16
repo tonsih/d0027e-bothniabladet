@@ -1,9 +1,9 @@
-import { FaTrash } from 'react-icons/fa';
-import '../scss/AdminImageCard.scss';
-import ActionButton from './ActionButton';
 import { useMutation } from '@apollo/client';
+import { FaTrash } from 'react-icons/fa';
 import { DELETE_REQUESTED_IMAGE } from '../mutations/imageMutations';
 import { GET_REQUESTED_IMAGES } from '../queries/imageQueries';
+import '../scss/AdminImageCard.scss';
+import ActionButton from './ActionButton';
 
 export const handleDeleteButtonClick = async (
 	requested_image_id,
@@ -46,7 +46,7 @@ const AdminImageRequestCard = ({ image }) => {
 				<img
 					className='card-img-top'
 					alt={requested_image_id}
-					src={image_url || 'https://placehold.co/500x400'}
+					src={image_url || 'https://placehold.co/500x400?text=No+Image'}
 				/>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>

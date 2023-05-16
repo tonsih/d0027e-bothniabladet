@@ -1,5 +1,10 @@
 import { useLazyQuery } from '@apollo/client';
+import { useMediaQuery } from '@mui/material';
 import { memo, useEffect } from 'react';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import Navbar from 'react-bootstrap/Navbar';
 import {
 	FaCamera,
 	FaCog,
@@ -7,27 +12,15 @@ import {
 	FaImage,
 	FaShoppingCart,
 	FaSignInAlt,
-	FaSignOutAlt,
 	FaUser,
 } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { LinkContainer } from 'react-router-bootstrap';
+import { useLocation } from 'react-router-dom';
 import { getMe, logout, reset } from '../features/auth/authSlice';
 import { USER_SHOPPING_CART_IMAGES } from '../queries/shoppingCartQueries';
 import '../scss/Header.scss';
-import AdminButton from './AdminButton';
 import CategoriesButton from './CategoriesButton';
-import MenuButton from './MenuButton';
-import UserMenu from './UserMenu';
-import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import { LinkContainer } from 'react-router-bootstrap';
-import { useMediaQuery } from '@mui/material';
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -40,6 +33,8 @@ const Header = () => {
 	);
 
 	const isXlScreenOrSmaller = useMediaQuery('(max-width:1199px)');
+
+	const location = useLocation();
 
 	useEffect(() => {
 		if (user?.shopping_cart)
@@ -71,33 +66,17 @@ const Header = () => {
 		return <NotLoggedInHeader />;
 	});
 
-	// const NotLoggedInHeader = () => (
-	// 	<>
-	// 		<li className='nav-item'>
-	// 			<Link to='/login' className='nav-link'>
-	// 				<MenuButton startIcon={<FaSignInAlt />}>Login</MenuButton>
-	// 			</Link>
-	// 		</li>
-	// 		<li className='nav-item'>
-	// 			<Link to='/register' className='nav-link'>
-	// 				<MenuButton startIcon={<FaUser />}>Register</MenuButton>
-	// 			</Link>
-	// 		</li>
-	// 	</>
-	// );
-
 	const NotLoggedInHeader = () => (
 		<>
+			<ImageRequestNavItem />
 			<LinkContainer to='/login'>
-				<Nav.Link>
-					{/* <MenuButton startIcon={<FaSignInAlt />}>Login</MenuButton> */}
+				<Nav.Link active={location.pathname === '/login'}>
 					<FaSignInAlt />
 					Login
 				</Nav.Link>
 			</LinkContainer>
 			<LinkContainer to='/register'>
-				<Nav.Link>
-					{/* <MenuButton startIcon={<FaUser />}>Register</MenuButton> */}
+				<Nav.Link active={location.pathname === '/register'}>
 					<FaUser />
 					Register
 				</Nav.Link>
@@ -107,19 +86,17 @@ const Header = () => {
 
 	const LoggedInHeader = props => (
 		<>
-			{/* <UserMenu email={user?.me?.email} /> */}
-			<UserDropdown />
-			{user?.me?.admin && <AdminNavItem />}
-			{data && (
+			{!user?.me?.admin && <ImageRequestNavItem />}
+			{data?.shopping_cart_images_by_sc_id && (
 				<LinkContainer to='/cart'>
-					<Nav.Link>
-						{/* <MenuButton startIcon={<FaShoppingCart />}> */}
+					<Nav.Link active={location.pathname === '/cart'}>
 						<FaShoppingCart />
 						{data.shopping_cart_images_by_sc_id.length}
-						{/* </MenuButton> */}
 					</Nav.Link>
 				</LinkContainer>
 			)}
+			{user?.me?.admin && <AdminNavItem />}
+			{user?.me && <UserDropdown />}
 		</>
 	);
 
@@ -151,6 +128,12 @@ const Header = () => {
 	};
 
 	const AdminNavItem = () => {
+		const isActiveAdminNavItem = (navItemName = '') => {
+			return location.pathname.startsWith(
+				`/admin/${navItemName.toLowerCase()}`
+			);
+		};
+
 		return (
 			<NavDropdown
 				title={
@@ -159,17 +142,35 @@ const Header = () => {
 					</span>
 				}
 				id={`offcanvasNavbarDropdown-expand-lg`}
+				active={isActiveAdminNavItem()}
 			>
 				<LinkContainer to='/admin/users'>
-					<NavDropdown.Item>Users</NavDropdown.Item>
+					<NavDropdown.Item active={isActiveAdminNavItem('users')}>
+						Users
+					</NavDropdown.Item>
 				</LinkContainer>
 				<LinkContainer to='/admin/images'>
-					<NavDropdown.Item>Images</NavDropdown.Item>
+					<NavDropdown.Item active={isActiveAdminNavItem('images')}>
+						Images
+					</NavDropdown.Item>
 				</LinkContainer>
 				<LinkContainer to='/admin/image-requests'>
-					<NavDropdown.Item>Requested Images</NavDropdown.Item>
+					<NavDropdown.Item active={isActiveAdminNavItem('image-requests')}>
+						Requested Images
+					</NavDropdown.Item>
 				</LinkContainer>
 			</NavDropdown>
+		);
+	};
+
+	const ImageRequestNavItem = () => {
+		return (
+			<LinkContainer to='/image-request'>
+				<Nav.Link active={location.pathname === '/image-request'}>
+					<FaImage />
+					Image Request
+				</Nav.Link>
+			</LinkContainer>
 		);
 	};
 
@@ -185,40 +186,25 @@ const Header = () => {
 				collapseOnSelect
 			>
 				<Container>
-					<LinkContainer to='/'>
+					<LinkContainer to='/' exact='true'>
 						<div className='logo-container'>
 							<Navbar.Brand href='#'>
 								<FaCamera className='pr-3' />
-								<span>BothniaBladet</span>
+								<span>Bothniabladet</span>
 							</Navbar.Brand>
 						</div>
 					</LinkContainer>
 					<Navbar.Toggle aria-controls={`responsive-navbar-nav`} />
 					<Navbar.Collapse id={`responsive-navbar-nav`}>
-						{/* <Nav className='justify-content-end flex-grow-1 pe-3'> */}
 						<Nav className='justify-content-end flex-grow-1'>
-							<LinkContainer to='/'>
-								<Nav.Link>
+							<LinkContainer to='/' exact='true'>
+								<Nav.Link active={location.pathname === '/'}>
 									<FaHome />
 									Home
 								</Nav.Link>
 							</LinkContainer>
 							<CategoriesButton />
 							<HeaderAlt />
-							{/* {!user?.me?.admin && (
-								<LinkContainer to='/image-request'>
-									<Nav.Link>
-										<FaImage />
-										Image Request
-									</Nav.Link>
-								</LinkContainer>
-							)} */}
-							<LinkContainer to='/image-request'>
-								<Nav.Link>
-									<FaImage />
-									Image Request
-								</Nav.Link>
-							</LinkContainer>
 						</Nav>
 					</Navbar.Collapse>
 				</Container>

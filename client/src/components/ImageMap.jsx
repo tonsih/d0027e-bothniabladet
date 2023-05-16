@@ -17,12 +17,30 @@ function ImageMap({ coordinates, image }) {
 
 	L.Marker.prototype.options.icon = defaultIcon;
 
+	// const convertCoordinates = coordString => {
+	// 	const [latStr, lonStr] = coordString.split(/[, ]+/);
+	// 	const lat = parseFloat(latStr.replace(/[^0-9.]/g, ''));
+	// 	const lon = parseFloat(lonStr.replace(/[^0-9.]/g, ''));
+	// 	const latitude = latStr.includes('S') ? -lat : lat;
+	// 	const longitude = lonStr.includes('W') ? -lon : lon;
+	// 	return { latitude, longitude };
+	// };
+
 	const convertCoordinates = coordString => {
-		const [latStr, lonStr] = coordString.split(/[, ]+/);
-		const lat = parseFloat(latStr.replace(/[^0-9.]/g, ''));
-		const lon = parseFloat(lonStr.replace(/[^0-9.]/g, ''));
-		const latitude = latStr.includes('S') ? -lat : lat;
-		const longitude = lonStr.includes('W') ? -lon : lon;
+		const [latStr, lonStr] = coordString.split(/, /);
+
+		// Parse latitude degrees, minutes, seconds, and direction
+		const [latDegrees, latMinutesDir] = latStr.split(/[, ]+/);
+		const latMinutes = parseFloat(latMinutesDir);
+		const lat = parseFloat(latDegrees) + latMinutes / 60;
+		const latitude = latMinutesDir.includes('S') ? -lat : lat;
+
+		// Parse longitude degrees, minutes, seconds, and direction
+		const [lonDegrees, lonMinutesDir] = lonStr.split(/[, ]+/);
+		const lonMinutes = parseFloat(lonMinutesDir);
+		const lon = parseFloat(lonDegrees) + lonMinutes / 60;
+		const longitude = lonMinutesDir.includes('W') ? -lon : lon;
+
 		return { latitude, longitude };
 	};
 
@@ -59,7 +77,9 @@ function ImageMap({ coordinates, image }) {
 					<img
 						className='w-100'
 						alt={image?.image_id}
-						src={image?.image_url || 'https://placehold.co/500x400'}
+						src={
+							image?.image_url || 'https://placehold.co/500x400?text=No+Image'
+						}
 					/>
 				</Popup>
 			</Marker>

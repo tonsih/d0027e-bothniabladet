@@ -1,3 +1,20 @@
 .dropzone-field {
 	max-width: 22em;
 }
+
+.profile-section {
+	margin-bottom: 3em;
+
+	.image-preview {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.delete-image-button {
+		margin-left: 10px;
+	}
+
+	.img-thumbnail {
+		max-width: 400px;
+	}
+}

@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { Checkbox, Chip, TextField, ThemeProvider } from '@mui/material';
 import exifr from 'exifr';
 import { Form, Formik, useField } from 'formik';
@@ -13,15 +13,18 @@ import {
 	ADD_IMAGE,
 	ADD_TECHNICAL_METADATA,
 	CREATE_IMAGE_TAG,
+	DELETE_REQUESTED_IMAGE,
 } from '../mutations/imageMutations';
 import {
 	GET_IMAGES_BY_TAG_NAME,
 	GET_IMAGE_TAGS,
 	GET_IMAGE_TAGS_BY_IMAGE_ID,
 	GET_LATEST_VERSION_IMAGES,
+	GET_REQUESTED_IMAGES,
 	GET_REQUESTED_IMAGE_FILE,
 } from '../queries/imageQueries';
 import '../scss/AddImageModal.scss';
+import '../scss/Buttons.scss';
 import '../scss/TextField.scss';
 import { theme } from '../style/themes';
 import ActionButton from './ActionButton';
@@ -129,6 +132,8 @@ const AddImageModal = ({
 		ADD_TECHNICAL_METADATA
 	);
 
+	const [deleteRequestedImage] = useMutation(DELETE_REQUESTED_IMAGE);
+
 	const [getITBIData, { refetch: refetchITBI }] = useLazyQuery(
 		GET_IMAGE_TAGS_BY_IMAGE_ID
 	);
@@ -199,7 +204,6 @@ const AddImageModal = ({
 
 	useEffect(() => {
 		if (reqImgFileData?.requested_image_file?.data && show) {
-			console.log(reqImgFileData?.requested_image_file?.data);
 			const {
 				data,
 				mime_type: mimeType,
@@ -214,10 +218,6 @@ const AddImageModal = ({
 			setRequestedImage(file);
 		}
 	}, [reqImgFileData, show]);
-
-	if (requestedImage) {
-		console.log(requestedImage);
-	}
 
 	return (
 		<>
@@ -337,23 +337,23 @@ const AddImageModal = ({
 													image_id,
 													name: tagName,
 												},
-												// refetchQueries: [
-												// 	{
-												// 		query: GET_IMAGE_TAGS,
-												// 	},
-												// 	{
-												// 		query: GET_IMAGES_BY_TAG_NAME,
-												// 		variables: {
-												// 			tag_name: tagName,
-												// 		},
-												// 	},
-												// 	{
-												// 		query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-												// 		variables: {
-												// 			image_id,
-												// 		},
-												// 	},
-												// ],
+												refetchQueries: [
+													// {
+													// 	query: GET_IMAGE_TAGS,
+													// },
+													{
+														query: GET_IMAGES_BY_TAG_NAME,
+														variables: {
+															tag_name: tagName,
+														},
+													},
+													// {
+													// 	query: GET_IMAGE_TAGS_BY_IMAGE_ID,
+													// 	variables: {
+													// 		image_id,
+													// 	},
+													// },
+												],
 												update(cache, { data: { createImageTag } }) {
 													const { tag } = createImageTag;
 
@@ -417,6 +417,15 @@ const AddImageModal = ({
 														});
 													}
 												},
+											});
+										}
+
+										if (requestedImage) {
+											deleteRequestedImage({
+												variables: {
+													requested_image_id: reqImgId,
+												},
+												refetchQueries: [{ query: GET_REQUESTED_IMAGES }],
 											});
 										}
 									} catch (error) {
@@ -566,16 +575,21 @@ const AddImageModal = ({
 									) : (
 										<>
 											<div className='imageUpload'>
-												{image?.name}
-												<ActionButton
-													variant='secondary'
-													onClick={() => {
-														setImage(null);
-														setThumbnail(null);
-													}}
-												>
-													<FaTrash />
-												</ActionButton>
+												<div className='preview-info-container d-flex'>
+													{image?.name}
+													<ActionButton
+														className='btn delete-image-button'
+														id='delete-image-button'
+														variant='outlined'
+														color='secondary'
+														onClick={() => {
+															setImage(null);
+															setThumbnail(null);
+														}}
+													>
+														<FaTrash />
+													</ActionButton>
+												</div>
 												<div className='image-preview p-2'>
 													<span>Image preview</span>
 													<img
@@ -602,15 +616,18 @@ const AddImageModal = ({
 									)}
 									<Modal.Footer>
 										<ActionButton
-											color='primary'
 											disabled={isSubmitting}
 											type='submit'
 											className='form-button'
+											variant='outlined'
+											color='primary'
 										>
 											Save Changes
 										</ActionButton>
 										<ActionButton
 											className='close-modal-button'
+											variant='outlined'
+											color='primary'
 											onClick={handleClose}
 										>
 											Close

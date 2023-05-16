@@ -1,14 +1,14 @@
-import { Button, Checkbox, TextField, ThemeProvider } from '@mui/material';
-import { theme } from '../style/themes';
-import { Form, Formik, useField } from 'formik';
-import * as yup from 'yup';
-import { useSelector } from 'react-redux';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { USERS_QUERY, USER_QUERY } from '../queries/userQueries';
+import { Button, Checkbox, TextField, ThemeProvider } from '@mui/material';
+import { Form, Formik, useField } from 'formik';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import * as yup from 'yup';
 import { UPDATE_USER } from '../mutations/userMutations';
-import _ from 'lodash';
+import { USERS_QUERY, USER_QUERY } from '../queries/userQueries';
+import { theme } from '../style/themes';
 
 const schema = yup.object({
 	first_name: yup.string().required('first name is required').min(1).max(15),

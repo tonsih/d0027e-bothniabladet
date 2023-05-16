@@ -1,9 +1,6 @@
 import AdminImageRequestRow from './AdminImageRequestRow';
 
 const AdminImageRequestRows = ({ images }) => {
-	console.log('images');
-	console.log(images);
-
 	return (
 		<table className='table table-dark table-hover'>
 			<thead>

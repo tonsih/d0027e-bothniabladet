@@ -1,8 +1,8 @@
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { Button } from '@mui/material';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import ActionButton from '../components/ActionButton';
 import ShoppingCartImageRow from '../components/ShoppingCartImageRow';
 import { CREATE_ORDER } from '../mutations/orderMutations';
 import {
@@ -14,6 +14,7 @@ import {
 	USER_SHOPPING_CART_IMAGE,
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
+import '../scss/Buttons.scss';
 
 const ShoppingCart = () => {
 	const navigate = useNavigate();
@@ -85,7 +86,10 @@ const ShoppingCart = () => {
 							{data?.shopping_cart_images_by_sc_id.length > 0 ? (
 								<>
 									Total: ${scData.shopping_cart_by_user_id.total_price}
-									<Button
+									<ActionButton
+										color='primary'
+										variant='outlined'
+										className='btn order-button'
 										onClick={async () => {
 											try {
 												const refetchQueries = imageIds.map(imageId => ({
@@ -132,7 +136,7 @@ const ShoppingCart = () => {
 										}}
 									>
 										Order
-									</Button>
+									</ActionButton>
 								</>
 							) : (
 								<>No items in the shopping cart</>

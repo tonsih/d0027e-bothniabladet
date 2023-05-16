@@ -1,8 +1,7 @@
 import { TextField, ThemeProvider } from '@mui/material';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { theme } from '../style/themes';
-import Images from './Images';
-import _ from 'lodash';
 
 const SearchFieldWithImages = ({
 	images,
@@ -18,7 +17,6 @@ const SearchFieldWithImages = ({
 
 	useEffect(() => {
 		let imgArr = [];
-		console.log(images);
 		for (let img of images) {
 			const { title } = img;
 			if (
@@ -36,6 +34,7 @@ const SearchFieldWithImages = ({
 			<ThemeProvider theme={theme}>
 				<TextField
 					id={id}
+					className='search-field'
 					label='Search'
 					variant='outlined'
 					value={searchWord}

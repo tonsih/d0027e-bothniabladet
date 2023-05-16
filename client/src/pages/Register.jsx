@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import YupPassword from 'yup-password';
+import { isRequiredString } from '../../utils/utils';
 import Spinner from '../components/Spinner';
 import { register, reset } from '../features/auth/authSlice';
 import { theme } from '../style/themes';
@@ -13,8 +14,16 @@ YupPassword(yup);
 
 const Register = () => {
 	const schema = yup.object({
-		first_name: yup.string().required().min(1).max(50),
-		last_name: yup.string().required().min(1).max(50),
+		first_name: yup
+			.string()
+			.required(isRequiredString('first name'))
+			.min(1)
+			.max(50),
+		last_name: yup
+			.string()
+			.required(isRequiredString('last name'))
+			.min(1)
+			.max(50),
 		email: yup.string().required().min(3).email().max(50),
 		password: yup
 			.string()

@@ -1,18 +1,11 @@
 import { useQuery } from '@apollo/client';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { useEffect, useState } from 'react';
 import Images from '../components/Images';
+import SearchFieldWithImages from '../components/SearchFieldWithImages';
 import Spinner from '../components/Spinner';
 import { GET_LATEST_VERSION_IMAGES } from '../queries/imageQueries';
-import {
-	TextField,
-	ThemeProvider,
-	useMediaQuery,
-	useTheme,
-} from '@mui/material';
 import '../scss/Home.scss';
-import { theme } from '../style/themes';
-import { useEffect, useState } from 'react';
-import _ from 'lodash';
-import SearchFieldWithImages from '../components/SearchFieldWithImages';
 
 const Home = () => {
 	const { loading, error, data } = useQuery(GET_LATEST_VERSION_IMAGES);

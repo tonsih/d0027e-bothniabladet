@@ -6,7 +6,7 @@
 		"start": "node server/index.js",
 		"client": "npm run dev --prefix client ",
 		"server": "nodemon server/index.js",
-		"dev": "concurrently \"npm run server --max-http-header-size=9999999\" \"npm run client\""
+		"dev": "concurrently \"npm run server\" \"npm run client\""
 	},
 	"keywords": [],
 	"author": "",

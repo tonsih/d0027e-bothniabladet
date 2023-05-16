@@ -14,7 +14,19 @@ const register = async ({ first_name, last_name, email, password }) => {
 		refetchQueries: [{ query: ME_QUERY }, { query: USERS_QUERY }],
 	});
 
-	return await data.registerUser;
+	const { registerUser } = await data;
+
+	const { data: scData } = await client.query({
+		query: USER_SHOPPING_CART,
+		variables: { user_id: registerUser.user_id },
+	});
+
+	return {
+		me: { ...registerUser },
+		shopping_cart: {
+			shopping_cart_id: scData?.shopping_cart_by_user_id?.shopping_cart_id,
+		},
+	};
 };
 
 const login = async ({ email, password }) => {

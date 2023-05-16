@@ -3,12 +3,11 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import * as React from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { logout, reset } from '../features/auth/authSlice';
 import { theme } from '../style/themes';
 import MenuButton from './MenuButton';
-import _ from 'lodash';
-import { useDispatch } from 'react-redux';
-import { logout, reset } from '../features/auth/authSlice';
 
 export default function UserMenu({ email }) {
 	const dispatch = useDispatch();

@@ -1,15 +1,9 @@
-import { ThemeProvider } from '@mui/material';
-import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import { FaHistory } from 'react-icons/fa';
-import '../scss/AddImageModal.scss';
-import { theme } from '../style/themes';
-import ActionButton from './ActionButton';
-import VersionDetailsModal from './VersionDetailsModal';
 import { useQuery } from '@apollo/client';
+import React from 'react';
 import { GET_TECHNICAL_METADATA } from '../queries/imageQueries';
+import '../scss/AddImageModal.scss';
 import MetadataModal from './MetadataModal';
+import VersionDetailsModal from './VersionDetailsModal';
 
 const VersionHistoryImageRow = ({ image }) => {
 	const {
@@ -41,7 +35,7 @@ const VersionHistoryImageRow = ({ image }) => {
 				<td className='w-50'>
 					<img
 						className='w-50'
-						src={imgUrl || 'https://placehold.co/500x400'}
+						src={imgUrl || 'https://placehold.co/500x400?text=No+Image'}
 					/>
 				</td>
 				<td>

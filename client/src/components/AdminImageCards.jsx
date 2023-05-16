@@ -15,17 +15,6 @@ const AdminImageCards = ({ images }) => {
 		setImgCards(imgCardsArr);
 	}, [images]);
 
-	return (
-		<>
-			{/* {images.map(
-				image =>
-					!image.deleted && (
-						<AdminImageCard key={image.image_id} image={image} />
-					)
-			)} */}
-			{/* {imgCards} */}
-			{<ComponentSlider components={imgCards} />}
-		</>
-	);
+	return <>{<ComponentSlider components={imgCards} />}</>;
 };
 export default AdminImageCards;
