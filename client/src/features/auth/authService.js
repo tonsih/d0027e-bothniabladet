@@ -18,7 +18,7 @@ const register = async ({ first_name, last_name, email, password }) => {
 
 	const { data: scData } = await client.query({
 		query: USER_SHOPPING_CART,
-		variables: { user_id: registerUser.user_id },
+		variables: { user_id: registerUser?.user_id },
 	});
 
 	return {

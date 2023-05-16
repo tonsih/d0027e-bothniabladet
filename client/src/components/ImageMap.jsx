@@ -17,25 +17,14 @@ function ImageMap({ coordinates, image }) {
 
 	L.Marker.prototype.options.icon = defaultIcon;
 
-	// const convertCoordinates = coordString => {
-	// 	const [latStr, lonStr] = coordString.split(/[, ]+/);
-	// 	const lat = parseFloat(latStr.replace(/[^0-9.]/g, ''));
-	// 	const lon = parseFloat(lonStr.replace(/[^0-9.]/g, ''));
-	// 	const latitude = latStr.includes('S') ? -lat : lat;
-	// 	const longitude = lonStr.includes('W') ? -lon : lon;
-	// 	return { latitude, longitude };
-	// };
-
 	const convertCoordinates = coordString => {
 		const [latStr, lonStr] = coordString.split(/, /);
 
-		// Parse latitude degrees, minutes, seconds, and direction
 		const [latDegrees, latMinutesDir] = latStr.split(/[, ]+/);
 		const latMinutes = parseFloat(latMinutesDir);
 		const lat = parseFloat(latDegrees) + latMinutes / 60;
 		const latitude = latMinutesDir.includes('S') ? -lat : lat;
 
-		// Parse longitude degrees, minutes, seconds, and direction
 		const [lonDegrees, lonMinutesDir] = lonStr.split(/[, ]+/);
 		const lonMinutes = parseFloat(lonMinutesDir);
 		const lon = parseFloat(lonDegrees) + lonMinutes / 60;
@@ -44,23 +33,17 @@ function ImageMap({ coordinates, image }) {
 		return { latitude, longitude };
 	};
 
-	// Handle changes to the input field
 	const handleInputChange = event => {
 		setCoordString(event.target.value);
 	};
 
-	// Convert the coordinate string to decimal degrees
 	const coords = convertCoordinates(coordString);
 
 	if (isNaN(coords.latitude) || isNaN(coords.longitude)) {
 		return <div>Invalid coordinates</div>;
 	}
 
-	// Render the map
 	return (
-		// <div>
-		// 	<input type='text' value={coordString} readOnly />
-
 		<MapContainer
 			center={[coords.latitude, coords.longitude]}
 			zoom={3}

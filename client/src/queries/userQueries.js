@@ -4,6 +4,8 @@ const ME_QUERY = gql`
 	query me {
 		me {
 			user_id
+			first_name
+			last_name
 			email
 			admin
 			banned
