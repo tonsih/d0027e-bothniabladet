@@ -737,7 +737,7 @@ const mutation = new GraphQLObjectType({
 
 				const hashedPassword = await bcrypt.hash(
 					password,
-					parseInt(process.env.SALT)
+					parseInt(process.env.BCRYPT_ROUNDS)
 				);
 
 				const createdUser = await user.create({
@@ -1729,7 +1729,7 @@ const mutation = new GraphQLObjectType({
 				if (password) {
 					hashedPassword = await bcrypt.hash(
 						password,
-						parseInt(process.env.SALT)
+						parseInt(process.env.BCRYPT_ROUNDS)
 					);
 				}
 
