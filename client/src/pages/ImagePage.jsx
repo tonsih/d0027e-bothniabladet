@@ -101,63 +101,56 @@ const ImagePage = () => {
 
 	return (
 		<>
-			{!error &&
-				!loading &&
-				data &&
-				data?.image(
-					<section>
-						<Link to='/'>
-							<ActionButton
-								variant='outlined'
-								color='primary'
-								className='w-100 p-3'
-							>
-								Go back to images
-							</ActionButton>
-						</Link>
-						<div className='container mt-3'>
-							<div className='row'>
-								<div className='col-md-6 col-sm-12'>
-									<img
-										className='card-img'
-										src={data?.image?.image_url}
-										alt=''
-									/>
+			{!error && !loading && data && data?.image && (
+				<section>
+					<Link to='/'>
+						<ActionButton
+							variant='outlined'
+							color='primary'
+							className='w-100 p-3'
+						>
+							Go back to images
+						</ActionButton>
+					</Link>
+					<div className='container mt-3'>
+						<div className='row'>
+							<div className='col-md-6 col-sm-12'>
+								<img className='card-img' src={data?.image?.image_url} alt='' />
+							</div>
+							<div className='col-md-6 col-sm-12'>
+								<h1 className='display-5 fw-bolder'>{data?.image?.title}</h1>
+								<div className='fs-5 mb-5'>
+									<span>${data?.image?.price}</span>
 								</div>
-								<div className='col-md-6 col-sm-12'>
-									<h1 className='display-5 fw-bolder'>{data?.image?.title}</h1>
-									<div className='fs-5 mb-5'>
-										<span>${data?.image?.price}</span>
-									</div>
-									<p className='lead'>{data?.image?.description}</p>
-									<div className='d-flex'>
-										<ActionButton
-											variant='outlined'
-											color='primary'
-											className='w-100 p-3'
-											disabled={
-												user &&
-												sciData?.shopping_cart_image_by_image_ids?.length > 0
-											}
-											{...(!user?.shopping_cart
-												? { onClick: onClickHandler }
-												: {
-														onClick: () =>
-															onAddToCart(
-																user?.shopping_cart?.shopping_cart_id,
-																data?.image?.image_id,
-																user?.me?.user_id
-															),
-												  })}
-										>
-											<ButtonTextHolder />
-										</ActionButton>
-									</div>
+								<p className='lead'>{data?.image?.description}</p>
+								<div className='d-flex'>
+									<ActionButton
+										variant='outlined'
+										color='primary'
+										className='w-100 p-3'
+										disabled={
+											user &&
+											sciData?.shopping_cart_image_by_image_ids?.length > 0
+										}
+										{...(!user?.shopping_cart
+											? { onClick: onClickHandler }
+											: {
+													onClick: () =>
+														onAddToCart(
+															user?.shopping_cart?.shopping_cart_id,
+															data?.image?.image_id,
+															user?.me?.user_id
+														),
+											  })}
+									>
+										<ButtonTextHolder />
+									</ActionButton>
 								</div>
 							</div>
 						</div>
-					</section>
-				)}
+					</div>
+				</section>
+			)}
 		</>
 	);
 };
