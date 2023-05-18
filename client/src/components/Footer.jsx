@@ -16,13 +16,6 @@ const Footer = () => {
 						</a>
 						<span className='text-muted'>© 2023 Bothniabladet</span>
 					</div>
-					{/* <ul className='nav col-md-4 justify-content-end list-unstyled d-flex'>
-						<li className='ms-2 fs-2'>
-							<a className='text-muted' href='https://github.com'>
-								<FaGithub />
-							</a>
-						</li>
-					</ul> */}
 				</div>
 			</footer>
 		</>

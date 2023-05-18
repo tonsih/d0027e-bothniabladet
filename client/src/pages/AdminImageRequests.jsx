@@ -41,8 +41,6 @@ const AdminImageRequests = () => {
 				)
 			) : (
 				<>
-					{/* {data?.latest_version_images &&
-								data?.latest_version_images.map(image => {})} */}
 					{requestedImages && (
 						<SearchFieldWithImages
 							images={requestedImages}

@@ -30,12 +30,7 @@ const AdminImageCard = ({ image }) => {
 		journalist,
 		distributable,
 	} = image;
-	const [deleteImage] = useMutation(DELETE_IMAGE, {
-		// refetchQueries: [
-		// 	{ query: GET_LATEST_VERSION_IMAGES },
-		// 	{ query: GET_IMAGE_TAGS },
-		// ],
-	});
+	const [deleteImage] = useMutation(DELETE_IMAGE);
 
 	const { user, isLoading, isError, isSuccess, message } = useSelector(
 		state => state.auth
@@ -139,8 +134,6 @@ const AdminImageCard = ({ image }) => {
 						Delete image
 					</ActionButton>
 				</div>
-
-				{/* </StyledLink> */}
 			</div>
 		</>
 	);

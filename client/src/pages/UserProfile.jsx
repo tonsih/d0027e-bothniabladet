@@ -62,20 +62,6 @@ const UserProfile = () => {
 
 	const [updateUser] = useMutation(UPDATE_USER);
 
-	const AdminIcon = () => {
-		return admin ? <FaCheckCircle /> : null;
-	};
-
-	// useEffect(() => {
-	// 	if (user?.me?.user_id) {
-	// 		getMeData({
-	// 			variables: {
-	// 				user_id: user?.me?.user_id,
-	// 			},
-	// 		});
-	// 	}
-	// }, [user?.me?.user_id]);
-
 	useEffect(() => {
 		if (meData?.me) {
 			const { first_name, last_name, email, admin } = meData?.me;

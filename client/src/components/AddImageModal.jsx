@@ -304,11 +304,6 @@ const AddImageModal = ({
 													: null,
 												size: (image || requestedImage)?.size || null,
 											},
-											// refetchQueries: [
-											// 	{
-											// 		query: GET_LATEST_VERSION_IMAGES,
-											// 	},
-											// ],
 											update(cache, { data: { addImage } }) {
 												const { latest_version_images } =
 													cache.readQuery({
@@ -338,21 +333,12 @@ const AddImageModal = ({
 													name: tagName,
 												},
 												refetchQueries: [
-													// {
-													// 	query: GET_IMAGE_TAGS,
-													// },
 													{
 														query: GET_IMAGES_BY_TAG_NAME,
 														variables: {
 															tag_name: tagName,
 														},
 													},
-													// {
-													// 	query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-													// 	variables: {
-													// 		image_id,
-													// 	},
-													// },
 												],
 												update(cache, { data: { createImageTag } }) {
 													const { tag } = createImageTag;

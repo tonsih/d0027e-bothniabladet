@@ -42,7 +42,6 @@ const AdminImageRequestCard = ({ image }) => {
 	return (
 		<>
 			<div className='card h-100 mt-3'>
-				{/* <StyledLink to={`/image/${image_id}`} key={image_id} className='w-100'> */}
 				<img
 					className='card-img-top'
 					alt={requested_image_id}

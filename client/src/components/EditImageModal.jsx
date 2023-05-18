@@ -293,15 +293,6 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 													name: tagName,
 												},
 												refetchQueries: [
-													// {
-													// 	query: GET_IMAGE_TAGS,
-													// },
-													// {
-													// 	query: GET_IMAGE_TAGS_BY_IMAGE_ID,
-													// 	variables: {
-													// 		image_id: new_image_id,
-													// 	},
-													// },
 													{
 														query: GET_IMAGES_BY_TAG_NAME,
 														variables: {

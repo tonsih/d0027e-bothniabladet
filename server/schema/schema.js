@@ -880,21 +880,6 @@ const mutation = new GraphQLObjectType({
 							createWriteStream(imgPath)
 						);
 
-						// stream.on('finish', async () => {
-						// 	if (tm) {
-						// 		sizeOf(imgPath, async (err, { width, height }) => {
-						// 			await tm.update({
-						// 				width,
-						// 				height,
-						// 			});
-						// 		});
-						// 	}
-
-						// 	await img.update({
-						// 		image_url: filename,
-						// 	});
-						// });
-
 						await new Promise((resolve, reject) => {
 							stream.on('finish', async () => {
 								if (tm) {

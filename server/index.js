@@ -8,7 +8,6 @@ const session = require('express-session');
 const port = process.env.PORT || 5000;
 const path = require('path');
 
-// Database
 const { sequelize: db, models } = require('./configs/db/db');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 

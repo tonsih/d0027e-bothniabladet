@@ -27,7 +27,6 @@ const AdminImageRows = ({ images }) => {
 								<AdminImageRow key={image.image_id} image={image} />
 							)
 					)}
-					{/* {imgRows} */}
 				</tbody>
 			</table>
 		</>
