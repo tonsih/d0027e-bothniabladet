@@ -37,13 +37,13 @@ required variables and their format.
 Run the following command to install the required dependencies:
 
     ```shell
-    npm i && cd client && npm i
+    npm i && cd client && npm i && cd ..
     ```
 
     or
 
     ```shell
-    npm install && cd client && npm install
+    npm install && cd client && npm install && cd ..
     ```
 
 
