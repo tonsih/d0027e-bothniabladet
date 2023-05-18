@@ -63,5 +63,10 @@ the development servers by running the following command:
 6. You should now have the development environment up and running. Access the 
 application by opening your web browser and visiting `http://localhost:3000`.
 
+Note: The SQL file "[db.sql](server/configs/db.sql)" for the MySQL database is 
+included in the repository at `server/configs/db/db.sql`. This file contains the 
+necessary SQL statements for setting up the MySQL database schema and initial 
+data. 
+
 ### Development Environment Setup Demonstration
 ![development-environment-setup-preview](assets/d0027e-development_environment_setup.gif)
