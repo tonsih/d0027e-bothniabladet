@@ -22,36 +22,46 @@ install npm (Node Package Manager) along with Node.js.
 To set up the development environment for this project, follow these 
 instructions:
 
-1. Open the terminal or command prompt and navigate to the project directory.
+1. Navigate to the project directory.
 
-2. Run the following command to install the required dependencies:
-
-```shell
-npm install
-```
-
-or
-
-```shell
-npm i
-```
-
-3. Create an `.env` file in the project root directory and provide the 
+2. Create an `.env` file in the project root directory and provide the 
 necessary configuration variables. Refer to the `.env.example` file for the 
 required variables and their format.
 
-4. Once the dependencies are installed and the `.env` file is configured, start 
+3. Run the "[install.sh](install.sh)" script to install the required dependencies:
+    ```shell
+    ./install.sh
+    ```
+
+4. ***Alternative to step 3.***  
+Run the following command to install the required dependencies:
+
+    ```shell
+    npm i && cd client && npm i
+    ```
+
+    or
+
+    ```shell
+    npm install && cd client && npm install
+    ```
+
+
+5. Once the dependencies are installed and the `.env` file is configured, start 
 the development servers by running the following command:
 
-```shell
-npm run dev
-```
+    ```shell
+    npm run dev
+    ```
 
-This command will start the backend server and the client server 
-simultaneously, allowing you to work with both parts of the application in 
-parallel.
+   This command will start the backend server and the client server 
+   simultaneously, allowing you to work with both parts of the application in 
+   parallel.
 
-By default, the client server is configured to run on `http://localhost:3000`.
+   By default, the client server is configured to run on `http://localhost:3000`.
 
-5. You should now have the development environment up and running. Access the 
+6. You should now have the development environment up and running. Access the 
 application by opening your web browser and visiting `http://localhost:3000`.
+
+### Development Environment Setup Demonstration
+![development-environment-setup-preview](assets/d0027e-development_environment_setup.GIF)
