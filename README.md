@@ -55,8 +55,7 @@ the development servers by running the following command:
     ```
 
    This command will start the backend server and the client server 
-   simultaneously, allowing you to work with both parts of the application in 
-   parallel.
+   simultaneously, running them in parallel.
 
    By default, the client server is configured to run on `http://localhost:3000`.
 
