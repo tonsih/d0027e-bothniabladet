@@ -6,10 +6,7 @@ const OrderImageRow = ({ image }) => {
 			<tr>
 				<th scope='row'>{image_id}</th>
 				<td className='w-25'>
-					<img
-						className='w-75'
-						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
-					/>
+					<img className='w-75' src={image_url} />
 				</td>
 				<td>{title}</td>
 				<td>${price}</td>

@@ -33,10 +33,7 @@ const VersionHistoryImageRow = ({ image }) => {
 				<td>{imgId}</td>
 				<td>{verNo}</td>
 				<td className='w-50'>
-					<img
-						className='w-50'
-						src={imgUrl || 'https://placehold.co/500x400?text=No+Image'}
-					/>
+					<img className='w-50' src={imgUrl} />
 				</td>
 				<td>
 					<VersionDetailsModal image={image} />

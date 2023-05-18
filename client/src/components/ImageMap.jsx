@@ -57,13 +57,7 @@ function ImageMap({ coordinates, image }) {
 				<Popup>
 					Coordinates: {coords.latitude.toFixed(6)},{' '}
 					{coords.longitude.toFixed(6)}
-					<img
-						className='w-100'
-						alt={image?.image_id}
-						src={
-							image?.image_url || 'https://placehold.co/500x400?text=No+Image'
-						}
-					/>
+					<img className='w-100' alt={image?.image_id} src={image?.image_url} />
 				</Popup>
 			</Marker>
 		</MapContainer>

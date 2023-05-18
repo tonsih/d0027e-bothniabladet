@@ -115,10 +115,6 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 		state => state.auth
 	);
 
-	const [getITBIData, { refetch: refetchITBI }] = useLazyQuery(
-		GET_IMAGE_TAGS_BY_IMAGE_ID
-	);
-
 	const [updateImage, { data: imgData }] = useMutation(UPDATE_IMAGE);
 
 	const [createImageTag] = useMutation(CREATE_IMAGE_TAG);
@@ -530,7 +526,6 @@ const EditImageModal = ({ imageToEdit, adminImageCard = false }) => {
 													{image?.name}
 													<ActionButton
 														className='btn delete-image-button'
-														id='delete-image-button'
 														variant='outlined'
 														color='secondary'
 														onClick={() => {

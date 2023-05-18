@@ -106,8 +106,10 @@ const ImageType = new GraphQLObjectType({
 		uses: { type: GraphQLInt },
 		image_url: {
 			type: GraphQLString,
-			async resolve(parent, _, { url }) {
-				return (await parent.image_url) && `${url}/images/${parent.image_url}`;
+			async resolve(parent, _, { url, placeholderImg }) {
+				return (await parent.image_url)
+					? `${url}/images/${parent.image_url}`
+					: placeholderImg;
 			},
 		},
 		description: { type: GraphQLString },

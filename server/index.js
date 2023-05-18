@@ -59,6 +59,7 @@ app.use(
 		context: {
 			session: req.session,
 			url: req.protocol + '://' + req.get('host'),
+			placeholderImg: 'https://placehold.co/500x400?text=No+Image',
 		},
 	}))
 );

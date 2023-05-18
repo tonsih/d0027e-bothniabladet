@@ -579,7 +579,6 @@ const AddImageModal = ({
 													{image?.name}
 													<ActionButton
 														className='btn delete-image-button'
-														id='delete-image-button'
 														variant='outlined'
 														color='secondary'
 														onClick={() => {

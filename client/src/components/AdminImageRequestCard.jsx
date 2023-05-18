@@ -46,7 +46,7 @@ const AdminImageRequestCard = ({ image }) => {
 				<img
 					className='card-img-top'
 					alt={requested_image_id}
-					src={image_url || 'https://placehold.co/500x400?text=No+Image'}
+					src={image_url}
 				/>
 				<div className='card-body'>
 					<h5 className='card-title fs-4'>{title}</h5>
@@ -60,7 +60,6 @@ const AdminImageRequestCard = ({ image }) => {
 
 				<div className='card-body d-flex align-items-end'>
 					<ActionButton
-						id='delete-image-button'
 						variant='outlined'
 						color='secondary'
 						className='btn w-100 p-3'

@@ -161,10 +161,7 @@ const AdminImageRow = ({ image }) => {
 			<tr>
 				<th scope='row'>{image_id}</th>
 				<td className='w-25'>
-					<img
-						className='w-75'
-						src={image_url || 'https://placehold.co/500x400?text=No+Image'}
-					/>
+					<img className='w-75' src={image_url} />
 				</td>
 				<td>{title}</td>
 				<td>${price}</td>
@@ -195,7 +192,6 @@ const AdminImageRow = ({ image }) => {
 				<td>
 					<ActionButton
 						className='btn delete-image-button admin-image-row'
-						id='delete-image-button'
 						variant='outlined'
 						color='secondary'
 						onClick={() =>
