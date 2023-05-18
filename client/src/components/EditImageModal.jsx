@@ -25,7 +25,6 @@ import {
 	USER_SHOPPING_CART_IMAGES,
 } from '../queries/shoppingCartQueries';
 import '../scss/AddImageModal.scss';
-import '../scss/EditImageModal.scss';
 import { theme } from '../style/themes';
 import ActionButton from './ActionButton';
 
