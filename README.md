@@ -64,4 +64,4 @@ the development servers by running the following command:
 application by opening your web browser and visiting `http://localhost:3000`.
 
 ### Development Environment Setup Demonstration
-![development-environment-setup-preview](assets/d0027e-development_environment_setup.GIF)
+![development-environment-setup-preview](assets/d0027e-development_environment_setup.gif)
