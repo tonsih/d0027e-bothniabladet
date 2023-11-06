@@ -1,12 +1,11 @@
 # Bothniabladet (D0027E - Examination Assignment)
 
 This repository contains the code and resources for the Bothniabladet project 
-developed as part of the D0027E course. The project, named 'Bothniabladet' is 
-developed for a fictional company of the same name. It encompasses an image 
+developed as part of the D0027E course. The project, named "Bothniabladet" is 
+developed for a fictional company of the same name and incorporates an image 
 management system with e-commerce functionality and includes a plethora of 
-useful features such as user login and registration, image uploading, order 
-creation, extraction and display of image metadata, image requests, and much 
-more.
+features such as user login and registration, image uploading, order creation, 
+extraction and display of image metadata, image requests, and much more.
 
 ## Prerequisites
 
