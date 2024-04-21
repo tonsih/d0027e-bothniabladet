@@ -27,9 +27,9 @@ instructions:
 necessary configuration variables. Refer to the `.env.example` file for the 
 required variables and their format.
 
-3. Run the "[install.sh](install.sh)" script to install the required dependencies:
+3. Run the "[install_dev_deps.sh](install_dev_deps.sh)" script to install the required dependencies:
     ```shell
-    ./install.sh
+    ./install_dev_deps.sh
     ```
 
 4. ***Alternative to step 3.***  
